@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\fiap_5nett_tech.Domain\fiap_5nett_tech.Domain.csproj" />
+      <ProjectReference Include="..\fiap_5nett_tech.Infrastructure\fiap_5nett_tech.Infrastructure.csproj" />		
+    </ItemGroup>
+
+</Project>

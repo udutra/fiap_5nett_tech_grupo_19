@@ -1,0 +1,46 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Fazer checkout do código
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Configurar .NET SDK
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '8.0.x'
+
+      # Restaurar dependências do projeto
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # Executar testes unitários
+      - name: Run unit tests
+        run: dotnet test --filter "Category=UnitTest"
+
+      # Executar testes de integração
+     # - name: Run integration tests
+     #   run: dotnet test --filter "Category=IntegrationTest"
+
+      # Construir o projeto
+      - name: Build project
+        run: dotnet build --configuration Release
+
+
+  # Executando containers via actions: 
+  # https://docs.github.com/pt/actions/sharing-automations/creating-actions/creating-a-docker-container-action
+  # https://docs.github.com/pt/actions/sharing-automations/creating-actions
+  # https://docs.github.com/pt/actions/use-cases-and-examples
