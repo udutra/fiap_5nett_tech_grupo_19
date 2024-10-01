@@ -32,8 +32,8 @@ jobs:
         run: dotnet test --filter "Category=UnitTest"
 
       # Executar testes de integração
-     # - name: Run integration tests
-     #   run: dotnet test --filter "Category=IntegrationTest"
+      - name: Run integration tests
+        run: dotnet test --filter "Category=IntegrationTest"
 
       # Construir o projeto
       - name: Build project
