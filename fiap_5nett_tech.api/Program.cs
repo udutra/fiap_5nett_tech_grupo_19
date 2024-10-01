@@ -9,11 +9,18 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+if (builder.Environment.IsEnvironment("Testing"))
+{
+    // Usa banco de dados em memória para testes
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseInMemoryDatabase("InMemoryDbForTesting"));
+}
+else
+{
     // Usa banco de dados SQL Server para desenvolvimento/produção
     builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+}
 
 builder.Services.AddScoped<IContactInterface, ContactService>();
 builder.Services.AddScoped<IContactRepository, ContactRepository>();

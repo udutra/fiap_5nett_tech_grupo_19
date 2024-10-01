@@ -4,6 +4,7 @@ using fiap_5nett_tech.Application.DataTransfer.Request;
 using fiap_5nett_tech.Application.DataTransfer.Response;
 using fiap_5nett_tech.Domain.Entities;
 using fiap_5nett_tech.Infrastructure.Data;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,6 +31,9 @@ public class ContactControllerIntegrationTests : IClassFixture<WebApplicationFac
                     db.Database.EnsureCreated();
                 }
             });
+
+            builder.UseEnvironment("Testing");
+
         });
 
         _client = _factory.CreateClient();
