@@ -26,6 +26,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="..\fiap_5nett_tech.IntegrationTest" />
+        <InternalsVisibleTo Include="fiap_5nett_tech.IntegrationTest" />
     </ItemGroup>
 </Project>
