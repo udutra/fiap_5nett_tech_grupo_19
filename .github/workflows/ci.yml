@@ -21,23 +21,23 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '8.0.x' # Atualize com a versão correta que você está usando
 
       # Restaurar dependências do projeto
       - name: Restore dependencies
         run: dotnet restore
 
-      # Executar testes unitários
-      - name: Run unit tests
-        run: dotnet test --filter "Category=UnitTest"
-
-      # Executar testes de integração
-      - name: Run integration tests
-        run: dotnet test --configuration Release --no-build --filter "Category=IntegrationTest"
-
       # Construir o projeto
       - name: Build project
         run: dotnet build --configuration Release
+
+      # Executar testes unitários
+      - name: Run unit tests
+        run: dotnet test --configuration Release --filter "Category=UnitTest"
+
+      # Executar testes de integração
+      - name: Run integration tests
+        run: dotnet test --configuration Release --filter "Category=IntegrationTest"
 
 
   # Executando containers via actions: 
