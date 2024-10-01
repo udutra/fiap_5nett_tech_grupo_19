@@ -33,7 +33,7 @@ jobs:
 
       # Executar testes de integração
       - name: Run integration tests
-        run: dotnet test --filter "Category=IntegrationTest"
+        run: dotnet test --configuration Release --no-build --filter "Category=IntegrationTest"
 
       # Construir o projeto
       - name: Build project
