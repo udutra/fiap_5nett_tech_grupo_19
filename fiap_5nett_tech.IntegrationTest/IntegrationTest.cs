@@ -20,8 +20,22 @@ public class ContactControllerIntegrationTests : IClassFixture<WebApplicationFac
     {
         _factory = factory.WithWebHostBuilder(builder =>
         {
+            builder.UseEnvironment("Testing");
             builder.ConfigureServices(services =>
             {
+                // Remove a configuração de DbContext existente
+                var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
+                if (descriptor != null)
+                {
+                    services.Remove(descriptor);
+                }
+
+                // Adiciona um DbContext em memória para testes
+                services.AddDbContext<AppDbContext>(options =>
+                {
+                    options.UseInMemoryDatabase("InMemoryDbForTesting");
+                });
+
                 // Limpa o banco de dados em memória antes de cada teste
                 var serviceProvider = services.BuildServiceProvider();
                 using (var scope = serviceProvider.CreateScope())
@@ -31,11 +45,7 @@ public class ContactControllerIntegrationTests : IClassFixture<WebApplicationFac
                     db.Database.EnsureCreated();
                 }
             });
-
-            builder.UseEnvironment("Testing");
-
         });
-
         _client = _factory.CreateClient();
     }
 

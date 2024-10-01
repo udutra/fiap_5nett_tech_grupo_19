@@ -14,6 +14,8 @@ if (builder.Environment.IsEnvironment("Testing"))
     // Usa banco de dados em memória para testes
     builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseInMemoryDatabase("InMemoryDbForTesting"));
+    Console.WriteLine($"Current Environment: {builder.Environment.EnvironmentName}");
+
 }
 else
 {
