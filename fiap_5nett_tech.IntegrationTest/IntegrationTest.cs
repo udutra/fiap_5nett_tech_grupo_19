@@ -22,21 +22,18 @@ public class ContactControllerIntegrationTests : IClassFixture<WebApplicationFac
         {
             builder.UseEnvironment("Testing");
             builder.ConfigureServices(services =>
-            {
-                // Remove a configuração de DbContext existente
+            {                
                 var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
                 if (descriptor != null)
                 {
                     services.Remove(descriptor);
                 }
-
-                // Adiciona um DbContext em memória para testes
+                             
                 services.AddDbContext<AppDbContext>(options =>
                 {
                     options.UseInMemoryDatabase("InMemoryDbForTesting");
                 });
-
-                // Limpa o banco de dados em memória antes de cada teste
+                                
                 var serviceProvider = services.BuildServiceProvider();
                 using (var scope = serviceProvider.CreateScope())
                 {
@@ -53,7 +50,7 @@ public class ContactControllerIntegrationTests : IClassFixture<WebApplicationFac
     [Trait("Category", "IntegrationTest")]
     public async Task CreateContact_ReturnsSuccess()
     {
-        // Arrange
+        //Caminho feliz
         var contactRequest = new ContactRequest
         {
             Name = "Joao da Silva",
@@ -61,12 +58,10 @@ public class ContactControllerIntegrationTests : IClassFixture<WebApplicationFac
             PhoneNumber = "996968512",
             Ddd = 14
         };
-
-        // Act
+        
         var response = await _client.PostAsJsonAsync("/api/Contact", contactRequest);
-
-        // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);       
 
         // Cleanup: Limpa o banco de dados ao final do teste
         using (var scope = _factory.Services.CreateScope())
@@ -76,6 +71,34 @@ public class ContactControllerIntegrationTests : IClassFixture<WebApplicationFac
         }
 
     }
+
+    [Fact]
+    [Trait("Category", "IntegrationTest")]
+    public async Task CreateContact_ReturnsBadRequest()
+    {        
+        // Arrange - Caso de erro (BadRequest)
+        var invalidContactRequest = new ContactRequest
+        {
+            Name = "", 
+            Email = "invalid-email", 
+            PhoneNumber = "123", 
+            Ddd = 0 
+        };
+
+        // Act - Requisição inválida
+        var invalidResponse = await _client.PostAsJsonAsync("/api/Contact", invalidContactRequest);
+
+        // Assert - Verifica se retornou BadRequest
+        Assert.Equal(HttpStatusCode.BadRequest, invalidResponse.StatusCode);
+
+        // Cleanup: Limpa o banco de dados ao final do teste
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            db.Database.EnsureDeleted();
+        }
+    }
+
 
     [Fact]
     [Trait("Category", "IntegrationTest")]
@@ -116,6 +139,34 @@ public class ContactControllerIntegrationTests : IClassFixture<WebApplicationFac
         }
     }
 
+
+    [Fact]
+    [Trait("Category", "IntegrationTest")]
+    public async Task UpdateContact_ReturnsBadReques()
+    {
+        // Arrange
+        var contactRequest = new ContactRequest
+        {
+            Name = "Joao ",
+            Email = "user@.com",
+            PhoneNumber = "9969",
+            Ddd = 14
+        };      
+
+        // Act
+        var response = await _client.PutAsJsonAsync("/api/Contact", contactRequest);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        // Cleanup: Limpa o banco de dados ao final do teste
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            db.Database.EnsureDeleted();
+        }
+    }
+
     [Fact]
     [Trait("Category", "IntegrationTest")]
     public async Task GetContactByDddAndPhone_ReturnsSuccess()
@@ -146,6 +197,26 @@ public class ContactControllerIntegrationTests : IClassFixture<WebApplicationFac
         }
     }
 
+
+    [Fact]
+    [Trait("Category", "IntegrationTest")]
+    public async Task GetContactByDddAndPhone_ReturnsBadRequest()
+    {      
+        // Act
+        var response = await _client.GetAsync("/api/Contact/14/996968512");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        // Cleanup: Limpa o banco de dados ao final do teste
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            db.Database.EnsureDeleted();
+        }
+    }
+
+
     [Fact]
     [Trait("Category", "IntegrationTest")]
     public async Task DeleteContact_ReturnsSuccess()
@@ -175,6 +246,26 @@ public class ContactControllerIntegrationTests : IClassFixture<WebApplicationFac
             db.Database.EnsureDeleted();
         }
     }
+
+
+    [Fact]
+    [Trait("Category", "IntegrationTest")]
+    public async Task DeleteContact_ReturnsBadRequest()
+    {
+        // Act
+        var response = await _client.DeleteAsync("/api/Contact/15/996968512");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        // Cleanup: Limpa o banco de dados ao final do teste
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            db.Database.EnsureDeleted();
+        }
+    }
+
 
     [Fact]
     [Trait("Category", "IntegrationTest")]
@@ -217,7 +308,27 @@ public class ContactControllerIntegrationTests : IClassFixture<WebApplicationFac
 
     [Fact]
     [Trait("Category", "IntegrationTest")]
-    public async Task GetAllContacts_ReturnsPagedResponse()
+    public async Task GetOneContactId_ReturnsNotFoud()
+    {
+        //Guid newGuid = Guid.NewGuid();
+        var newGuid = "7377d891 - f966 - 48a9 - b7c6 - 1469b5925037";
+
+        var responseGetById = await _client.GetAsync($"/api/Contact/{newGuid}");
+
+        Assert.Equal(HttpStatusCode.NotFound, responseGetById.StatusCode);
+
+        // Cleanup: Limpa o banco de dados ao final do teste
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            db.Database.EnsureDeleted();
+        }
+    }
+
+
+    [Fact]
+    [Trait("Category", "IntegrationTest")]
+    public async Task GetAllContacts_ReturnsPagedResponseSucess()
     {
         // Arrange
         var contactRequest1 = new ContactRequest
@@ -273,4 +384,31 @@ public class ContactControllerIntegrationTests : IClassFixture<WebApplicationFac
             db.Database.EnsureDeleted();
         }
     }
+
+
+    [Fact]
+    [Trait("Category", "IntegrationTest")]
+    public async Task GetAllContacts_ReturnsPagedResponseBadRequest()
+    {
+        // Define parâmetros de paginação e filtros
+        var getAllContactRequest = new
+        {
+            PageNumber = 1,
+            PageSize = 'x'
+        };
+
+        // Act
+        var response = await _client.GetAsync($"/api/Contact?PageNumber={getAllContactRequest.PageNumber}&PageSize={getAllContactRequest.PageSize}");        
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        // Cleanup: Limpa o banco de dados ao final do teste
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            db.Database.EnsureDeleted();
+        }
+    }
+
+
 }
