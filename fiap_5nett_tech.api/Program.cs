@@ -6,6 +6,7 @@ using fiap_5nett_tech.Infrastructure.Data;
 using fiap_5nett_tech.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IContactInterface, ContactService>();
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();
+
+builder.Services.UseHttpClientMetrics();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -29,6 +32,9 @@ builder.Services.AddSwaggerGen(c =>
 );
 
 var app = builder.Build();
+
+app.UseMetricServer();
+app.UseHttpMetrics();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

@@ -1,18 +1,15 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+ï»¿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+USER app
 WORKDIR /app
 EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-
-# Copiar o arquivo .csproj para restaurar dependências
-COPY ["fiap_5nett_tech.api.csproj", "."]
-RUN dotnet restore "./fiap_5nett_tech.api.csproj"
-
-# Copiar todo o código-fonte e construir o projeto
+COPY ["fiap_5nett_tech.api/fiap_5nett_tech.api.csproj", "fiap_5nett_tech.api/"]
+RUN dotnet restore "./fiap_5nett_tech.api/fiap_5nett_tech.api.csproj"
 COPY . .
-WORKDIR "/src"
+WORKDIR "/src/fiap_5nett_tech.api"
 RUN dotnet build "./fiap_5nett_tech.api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish

@@ -1,0 +1,21 @@
+# This is a generated file. Not intended for manual editing.
+version: "3.4"
+services:
+  my-api:
+    build:
+      context: "C:\\Users\\Guilherme\\Documents\\Github\\Fiap\\fiap_5nett_tech_grupo_19\\\
+        fiap_5nett_tech.api"
+      dockerfile: "Dockerfile"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net8.0/fiap_5nett_tech.api.dll"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "fiap_5nett_tech.api:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\Guilherme\\.nuget\\packages:/root/.nuget/packages"
+    - "C:\\Users\\Guilherme\\Documents\\Github\\Fiap\\fiap_5nett_tech_grupo_19\\fiap_5nett_tech.api:/app:rw"
+    - "C:\\Users\\Guilherme\\Documents\\Github\\Fiap\\fiap_5nett_tech_grupo_19:/src:rw"
+    working_dir: "/app"
