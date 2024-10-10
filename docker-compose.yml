@@ -1,4 +1,15 @@
 services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      SA_PASSWORD: "1q2w3e4r@#$"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    networks:
+      - mynw
+
   fiap_5nett_tech:
     image: ${DOCKER_REGISTRY-}fiap_5nett_tech.api
     ports:
