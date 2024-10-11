@@ -5,16 +5,13 @@ using fiap_5nett_tech.Domain.Repositories;
 using fiap_5nett_tech.Infrastructure.Data;
 using fiap_5nett_tech.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.OpenApi.Models;
+using OpenTelemetry.Metrics;
 using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
-    builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-    
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IContactInterface, ContactService>();
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
@@ -33,10 +30,20 @@ builder.Services.AddSwaggerGen(c =>
     }
 );
 
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(b =>
+    {
+        b.AddPrometheusExporter();
+        b.AddAspNetCoreInstrumentation();
+        b.AddRuntimeInstrumentation();
+        b.AddHttpClientInstrumentation();
+    });
+
 var app = builder.Build();
 
 app.UseMetricServer();
 app.UseHttpMetrics();
+app.MapPrometheusScrapingEndpoint();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
