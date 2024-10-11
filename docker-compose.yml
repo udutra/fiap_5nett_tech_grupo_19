@@ -13,15 +13,16 @@ services:
   fiap_5nett_tech:
     image: ${DOCKER_REGISTRY-}fiap_5nett_tech.api
     ports:
-      - 8080:8080
+      - 7015:7015
     build:
       context: .
       dockerfile: fiap_5nett_tech.api/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTP_PORTS=7015
     networks:
       - mynw
+
   prometheus:
     image: prom/prometheus
     ports:
@@ -32,6 +33,7 @@ services:
       - '--config.file=/etc/prometheus/prometheus.yml'
     networks:
       - mynw
+
   grafana:
     image: grafana/grafana
     ports:
@@ -44,5 +46,6 @@ services:
       - prometheus
     networks:
       - mynw
+
 networks:
   mynw:

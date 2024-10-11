@@ -1,6 +1,7 @@
 ﻿using fiap_5nett_tech.Domain.Entities;
 using fiap_5nett_tech.Infrastructure.Data.Mappings;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace fiap_5nett_tech.Infrastructure.Data;
 
@@ -20,10 +21,6 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasForeignKey(c => c.Ddd)
             .HasConstraintName("FK_CONTACT_REGION");
         
-        base.OnModelCreating(modelBuilder);
-
-        
-
         modelBuilder.Entity<Region>().HasData(
         [
             new Region(11, "São Paulo"),
@@ -94,5 +91,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             new Region(98, "Maranhão"),
             new Region(99, "Maranhão")
         ]);
+        
+        base.OnModelCreating(modelBuilder);
     }   
 }
