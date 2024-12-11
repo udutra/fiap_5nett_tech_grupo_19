@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "fiap_5nett_tech.api", "fiap_5nett_tech.api\fiap_5nett_tech.api.csproj", "{C40EC669-CD34-4A5A-8920-15AF0DD76013}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "fiap_5nett_tech.Api", "fiap_5nett_tech.Api\fiap_5nett_tech.Api.csproj", "{C40EC669-CD34-4A5A-8920-15AF0DD76013}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "fiap_5nett_tech.Application", "fiap_5nett_tech.Application\fiap_5nett_tech.Application.csproj", "{5196F835-F8E1-4B12-84D8-0F35CAC309AF}"
 EndProject

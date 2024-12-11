@@ -6,7 +6,7 @@ namespace fiap_5nett_tech.Application.Interface
 {
     public interface IContactInterface
     {
-        ContactResponse<Contact?> Create(ContactRequest request);
+        Task<ContactResponse<Contact?>> Create();
         ContactResponse<Contact?> GetOne(Guid id);
         ContactResponse<Contact?> GetOne(int ddd, string telefone);
         ContactResponse<Contact?> Delete(int ddd, string telefone);

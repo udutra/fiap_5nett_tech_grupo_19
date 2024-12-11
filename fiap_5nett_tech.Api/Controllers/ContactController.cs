@@ -1,10 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text;
+using System.Text.Json;
 using Azure;
+using fiap_5nett_tech.Application;
 using fiap_5nett_tech.Application.DataTransfer.Request;
 using fiap_5nett_tech.Application.DataTransfer.Response;
 using fiap_5nett_tech.Application.Interface;
 using fiap_5nett_tech.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+using RabbitMQ.Client;
 
 namespace fiap_5nett_tech.api.Controllers;
 
@@ -27,16 +31,45 @@ public class ContactController : ControllerBase
     /// <response code="500">Houve um erro interno no servidor.</response>
     /// <returns>Uma resposta de contato recém-criada.</returns>
     [HttpPost]
-    public IActionResult Create([FromBody] ContactRequest contactRequest)
+    public async Task<IActionResult> Create([FromBody] ContactRequest contactRequest)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
         
-        var response = _contactInterface.Create(contactRequest);
+        var factory = new ConnectionFactory()
+        {
+            HostName = "localhost",
+            UserName = "username",
+            Password = "password",
+            VirtualHost = "/",
+            Port = 5672,
+            NetworkRecoveryInterval = TimeSpan.FromSeconds(10),
+            AutomaticRecoveryEnabled = true
+        };
+
+        using var connection = factory.CreateConnectionAsync();
+        var channel = connection.Result.CreateChannelAsync().Result;
         
-        return response.IsSuccess ? Ok(response) : Problem(null, null, 500, response.Message);
+        await channel.ExchangeDeclareAsync(exchange: ExchangeConfiguration.Name, type: "direct", durable: true, autoDelete: false, arguments: null);
+        await channel.QueueDeclareAsync(queue: QueueConfiguration.ContactCreatedQueue, durable: false, exclusive: false, autoDelete: false, arguments: null);
+        await channel.QueueBindAsync(queue: QueueConfiguration.ContactCreatedQueue, exchange: ExchangeConfiguration.Name, 
+            routingKey: RoutingKeyConfiguration.RoutingQueueCreate, arguments: null);
+        
+        var message = JsonSerializer.Serialize(contactRequest);
+        var body = Encoding.UTF8.GetBytes(message);
+        
+        await channel.BasicPublishAsync(
+            exchange: ExchangeConfiguration.Name, 
+            routingKey: RoutingKeyConfiguration.RoutingQueueCreate, 
+            mandatory: true, 
+            body);
+        
+        //var response = _contactInterface.Create(contactRequest);
+        //return response.IsSuccess ? Ok(response) : Problem(null, null, 500, response.Message);
+
+        return Ok();
     }
 
     /// <summary>

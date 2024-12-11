@@ -28,7 +28,7 @@
     <ItemGroup>
         <ProjectReference Include="..\fiap_5nett_tech.Application\fiap_5nett_tech.Application.csproj" />
         <ProjectReference Include="..\fiap_5nett_tech.Infrastructure\fiap_5nett_tech.Infrastructure.csproj" />
-        <ProjectReference Include="..\fiap_5nett_tech.api\fiap_5nett_tech.api.csproj" />
+        <ProjectReference Include="..\fiap_5nett_tech.Api\fiap_5nett_tech.Api.csproj" />
     </ItemGroup>
 
 </Project>
