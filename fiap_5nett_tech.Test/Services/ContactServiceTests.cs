@@ -1,7 +1,9 @@
+using Azure;
 using Moq;
 using fiap_5nett_tech.Application.Service;
 using fiap_5nett_tech.Domain.Repositories;
 using fiap_5nett_tech.Application.DataTransfer.Request;
+using fiap_5nett_tech.Application.DataTransfer.Response;
 using fiap_5nett_tech.Domain.Entities;
 
 namespace fiap_5nett_tech.Test.Services;
@@ -37,13 +39,15 @@ public class ContactServiceTests
         _mockContactRepository.Setup(c => c.GetOne(request.Ddd, request.PhoneNumber)).Returns((Contact)null);
 
         
-        var response = _contactService.Create(request);
+        var response = _contactService.Create();
 
+        //Em dev
         
-        Assert.NotNull(response);
-        Assert.Equal(200, response.Code);
-        Assert.Equal("Contato criado com sucesso!", response.Message);
-        Assert.NotNull(response.Data);
+        
+        Assert.NotNull(response.Result);
+        Assert.Equal(200, response.Result.Code);
+        Assert.Equal("Contato criado com sucesso!", response.Result.Message);
+        Assert.NotNull(response.Result.Data);
         _mockContactRepository.Verify(c => c.Create(It.IsAny<Contact>()), Times.Once);
     }
 
@@ -63,14 +67,14 @@ public class ContactServiceTests
         _mockRegionRepository.Setup(r => r.GetOne(request.Ddd)).Returns((Region)null);
 
         
-        var response = _contactService.Create(request);
+        var response = _contactService.Create();
 
-        var resposta = response.Message.Normalize();
+        var resposta = response.Result.Message.Normalize();
         
-        Assert.NotNull(response);
-        Assert.Equal(400, response.Code);
-        Assert.Equal("Região não encontrada!", response.Message);
-        Assert.Null(response.Data);
+        Assert.NotNull(response.Result);
+        Assert.Equal(400, response.Result.Code);
+        Assert.Equal("Região não encontrada!", response.Result.Message);
+        Assert.Null(response.Result.Data);
         _mockContactRepository.Verify(c => c.Create(It.IsAny<Contact>()), Times.Never);
     }
 
@@ -91,12 +95,12 @@ public class ContactServiceTests
         _mockRegionRepository.Setup(r => r.GetOne(request.Ddd)).Returns(new Region { Ddd = 11, Name = "São Paulo" });
         _mockContactRepository.Setup(c => c.GetOne(request.Ddd, request.PhoneNumber)).Returns(existingContact);
 
-        var response = _contactService.Create(request);
+        var response = _contactService.Create();
 
-        Assert.NotNull(response);
-        Assert.Equal(400, response.Code);
-        Assert.Equal("Telefone já Cadastrado!", response.Message);
-        Assert.Null(response.Data);
+        Assert.NotNull(response.Result);
+        Assert.Equal(400, response.Result.Code);
+        Assert.Equal("Telefone já Cadastrado!", response.Result.Message);
+        Assert.Null(response.Result.Data);
         _mockContactRepository.Verify(c => c.Create(It.IsAny<Contact>()), Times.Never);
     }
 
@@ -115,12 +119,12 @@ public class ContactServiceTests
 
         _mockRegionRepository.Setup(r => r.GetOne(request.Ddd)).Returns(new Region { Ddd = 11, Name = "São Paulo" });
 
-        var response = _contactService.Create(request);
+        var response = _contactService.Create();
         
-        Assert.NotNull(response);
-        Assert.Equal(400, response.Code);
-        Assert.Equal("Quantidade de caracteres de telefone invalido!", response.Message);
-        Assert.Null(response.Data);
+        Assert.NotNull(response.Result);
+        Assert.Equal(400, response.Result.Code);
+        Assert.Equal("Quantidade de caracteres de telefone invalido!", response.Result.Message);
+        Assert.Null(response.Result.Data);
         _mockContactRepository.Verify(c => c.Create(It.IsAny<Contact>()), Times.Never);
     }
 
