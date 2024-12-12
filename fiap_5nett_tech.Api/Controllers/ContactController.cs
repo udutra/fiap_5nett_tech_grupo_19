@@ -41,17 +41,17 @@ public class ContactController : ControllerBase
         var factory = new ConnectionFactory()
         {
             HostName = "localhost",
-            UserName = "username",
-            Password = "password",
+            UserName = "guest",
+            Password = "guest",
             VirtualHost = "/",
             Port = 5672,
             NetworkRecoveryInterval = TimeSpan.FromSeconds(10),
             AutomaticRecoveryEnabled = true
         };
 
-        using var connection = factory.CreateConnectionAsync();
-        var channel = connection.Result.CreateChannelAsync().Result;
-        
+        using var connection = await factory.CreateConnectionAsync();
+        using var channel = await connection.CreateChannelAsync();
+
         await channel.ExchangeDeclareAsync(exchange: ExchangeConfiguration.Name, type: "direct", durable: true, autoDelete: false, arguments: null);
         await channel.QueueDeclareAsync(queue: QueueConfiguration.ContactCreatedQueue, durable: false, exclusive: false, autoDelete: false, arguments: null);
         await channel.QueueBindAsync(queue: QueueConfiguration.ContactCreatedQueue, exchange: ExchangeConfiguration.Name, 
