@@ -1,15 +1,15 @@
 ﻿using System.Text;
 using System.Text.Json;
+using fiap_5nett_tech.api.Interfaces;
+using fiap_5nett_tech.Application;
 using fiap_5nett_tech.Application.DataTransfer.Request;
-using fiap_5nett_tech.Application.Interface;
-using fiap_5nett_tech.Domain.Entities;
 using fiap_5nett_tech.Application.DataTransfer.Response;
+using fiap_5nett_tech.Domain.Entities;
 using fiap_5nett_tech.Domain.Repositories;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-
-namespace fiap_5nett_tech.Application.Service
+namespace fiap_5nett_tech.api.Services
 {
     public class ContactService : IContactInterface
     {

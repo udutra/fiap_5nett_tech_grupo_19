@@ -1,6 +1,7 @@
 using System.Reflection;
+using fiap_5nett_tech.api.Interfaces;
+using fiap_5nett_tech.api.Services;
 using fiap_5nett_tech.Application.Interface;
-using fiap_5nett_tech.Application.Service;
 using fiap_5nett_tech.Domain.Repositories;
 using fiap_5nett_tech.Infrastructure.Data;
 using fiap_5nett_tech.Infrastructure.Repositories;
@@ -28,6 +29,8 @@ builder.Services.AddSwaggerGen(c => {
         c.IncludeXmlComments(xmlPath);
     }
 );
+
+builder.Services.AddHostedService<RabbitMqAddUserConsumerService>();
 
 builder.Services.AddOpenTelemetry()
     .WithMetrics(b =>

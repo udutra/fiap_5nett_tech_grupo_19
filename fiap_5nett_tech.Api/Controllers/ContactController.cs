@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.Json;
 using Azure;
+using fiap_5nett_tech.api.Interfaces;
 using fiap_5nett_tech.Application;
 using fiap_5nett_tech.Application.DataTransfer.Request;
 using fiap_5nett_tech.Application.DataTransfer.Response;

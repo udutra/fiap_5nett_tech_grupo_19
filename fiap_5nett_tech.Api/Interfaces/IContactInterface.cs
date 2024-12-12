@@ -2,7 +2,7 @@
 using fiap_5nett_tech.Application.DataTransfer.Response;
 using fiap_5nett_tech.Domain.Entities;
 
-namespace fiap_5nett_tech.Application.Interface
+namespace fiap_5nett_tech.api.Interfaces
 {
     public interface IContactInterface
     {
