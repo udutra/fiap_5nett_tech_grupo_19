@@ -53,8 +53,8 @@ public class ContactController : ControllerBase
             AutomaticRecoveryEnabled = true
         };
 
-        using var connection = await factory.CreateConnectionAsync();
-        using var channel = await connection.CreateChannelAsync();
+       await using var connection = await factory.CreateConnectionAsync();
+       await using var channel = await connection.CreateChannelAsync();
 
         await channel.ExchangeDeclareAsync(exchange: ExchangeConfiguration.Name, type: "direct", durable: true, autoDelete: false, arguments: null);
         await channel.QueueDeclareAsync(queue: QueueConfiguration.ContactCreatedQueue, durable: false, exclusive: false, autoDelete: false, arguments: null);

@@ -6,11 +6,12 @@ namespace fiap_5nett_tech.Infrastructure.Repositories;
 
 public class RegionRepository : IRegionRepository
 {
-    private readonly AppDbContext _context;
-    
+    private readonly AppDbContext _context;    
+
     public RegionRepository(AppDbContext context)
     {
         _context = context;
+        Console.WriteLine(_context == null ? "AppDbContext é null!" : "AppDbContext injetado com sucesso.");
     }
     
     public IQueryable<Region> GetAll(string name)
@@ -19,7 +20,8 @@ public class RegionRepository : IRegionRepository
     }
 
     public Region? GetOne(int id)
-    {
+    {      
+
         return _context.Regions.FirstOrDefault(x => x.Ddd == id);
     }
 }

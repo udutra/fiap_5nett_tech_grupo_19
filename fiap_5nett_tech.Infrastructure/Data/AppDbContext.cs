@@ -5,8 +5,9 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace fiap_5nett_tech.Infrastructure.Data;
 
-public class AppDbContext(DbContextOptions options) : DbContext(options)
+public class AppDbContext : DbContext
 {
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
     public DbSet<Contact> Contacts { get; set; }
     public DbSet<Region> Regions { get; set; }
 

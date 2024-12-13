@@ -1,5 +1,7 @@
 ﻿using fiap_5nett_tech.api.Consumers;
 using fiap_5nett_tech.Domain.Repositories;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace fiap_5nett_tech.api.Services;
@@ -9,8 +11,8 @@ public class RabbitMqAddUserConsumerService : IHostedService
     private RabbitMqAddUserConsumer _consumer;
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly ILogger<RabbitMqAddUserConsumerService> _logger;
+    private IServiceScope _serviceScope; // Manter o escopo ativo durante a execução
 
-    // Construtor com injeção de dependência para IServiceScopeFactory e ILogger
     public RabbitMqAddUserConsumerService(
         IServiceScopeFactory serviceScopeFactory,
         ILogger<RabbitMqAddUserConsumerService> logger)
@@ -19,44 +21,45 @@ public class RabbitMqAddUserConsumerService : IHostedService
         _logger = logger;
     }
 
-    // Método para acessar o consumidor
-    public RabbitMqAddUserConsumer Get_consumer()
+    public RabbitMqAddUserConsumer GetConsumer()
     {
         return _consumer;
     }
 
-    // Implementação correta do StartAsync sem parâmetros adicionais
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken cancellationToken)
     {
         try
         {
-            // Criar um escopo de serviço para o RabbitMqAddUserConsumer
-            using (var scope = _serviceScopeFactory.CreateScope())
-            {
-                var contactRepository = scope.ServiceProvider.GetRequiredService<IContactRepository>();
-                var regionRepository = scope.ServiceProvider.GetRequiredService<IRegionRepository>();
+            // Criar um escopo persistente para o tempo de vida do serviço
+            _serviceScope = _serviceScopeFactory.CreateScope();
 
-                // Criar e iniciar o consumidor
-                _consumer = new RabbitMqAddUserConsumer(contactRepository, regionRepository);
-                _consumer.Start(); // Inicia o consumidor
+            // Resolver dependências do consumidor
+            var contactRepository = _serviceScope.ServiceProvider.GetRequiredService<IContactRepository>();
+            var regionRepository = _serviceScope.ServiceProvider.GetRequiredService<IRegionRepository>();
 
-                _logger.LogInformation("RabbitMqAddUserConsumer iniciado com sucesso.");
-            }
+            // Criar e iniciar o consumidor
+            _consumer = new RabbitMqAddUserConsumer(contactRepository, regionRepository);
+            _consumer.Start(); // Inicia o consumidor
+
+            _logger.LogInformation("RabbitMqAddUserConsumer iniciado com sucesso.");
         }
         catch (Exception ex)
         {
-            // Log de erro
             _logger.LogError(ex, "Erro ao iniciar o RabbitMqAddUserConsumer.");
         }
+
+        return Task.CompletedTask;
     }
 
-    // Método para parar o serviço
-    public async Task StopAsync(CancellationToken cancellationToken)
+    public Task StopAsync(CancellationToken cancellationToken)
     {
         try
         {
-            // Caso precise de lógica de parada do consumer, ela deve ser implementada aqui
-            _consumer?.Stop(); // Supondo que você tenha um método Stop no RabbitMqAddUserConsumer
+            // Parar o consumidor, se necessário
+            _consumer?.Stop();
+
+            // Liberar o escopo de serviço
+            _serviceScope?.Dispose();
 
             _logger.LogInformation("RabbitMqAddUserConsumer parado com sucesso.");
         }
@@ -64,5 +67,7 @@ public class RabbitMqAddUserConsumerService : IHostedService
         {
             _logger.LogError(ex, "Erro ao parar o RabbitMqAddUserConsumer.");
         }
+
+        return Task.CompletedTask;
     }
 }
