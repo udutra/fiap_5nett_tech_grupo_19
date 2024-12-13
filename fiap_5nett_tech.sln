@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "fiap_5nett_tech.api", "fiap_5nett_tech.api\fiap_5nett_tech.api.csproj", "{C40EC669-CD34-4A5A-8920-15AF0DD76013}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "fiap_5nett_tech.Application", "fiap_5nett_tech.Application\fiap_5nett_tech.Application.csproj", "{5196F835-F8E1-4B12-84D8-0F35CAC309AF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "fiap_5nett_tech.Domain", "fiap_5nett_tech.Domain\fiap_5nett_tech.Domain.csproj", "{FEF8CAF7-157E-43E1-92FD-0848F113A3BC}"
@@ -18,7 +16,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Itens de Solução", "Itens
 		.github\workflows\ci.yml = .github\workflows\ci.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fiap_5nett_tech.IntegrationTest", "fiap_5nett_tech.IntegrationTest\fiap_5nett_tech.IntegrationTest.csproj", "{A9AE750B-1C54-4507-8CFD-97D9AD9C1517}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fiap_5nett_tech.Api.Contact.Create", "fiap_5nett_tech.Api.Contact.Create\fiap_5nett_tech.Api.Contact.Create.csproj", "{0E8A96AC-2363-4716-8A6C-25C5B9F859A1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fiap_5nett_tech.Api.Contact.Create.Consumer", "fiap_5nett_tech.Api.Contact.Create.Consumer\fiap_5nett_tech.Api.Contact.Create.Consumer.csproj", "{9243CBC8-5C4A-483B-BCD7-829D0C5D3227}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,10 +26,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C40EC669-CD34-4A5A-8920-15AF0DD76013}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C40EC669-CD34-4A5A-8920-15AF0DD76013}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C40EC669-CD34-4A5A-8920-15AF0DD76013}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C40EC669-CD34-4A5A-8920-15AF0DD76013}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5196F835-F8E1-4B12-84D8-0F35CAC309AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5196F835-F8E1-4B12-84D8-0F35CAC309AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5196F835-F8E1-4B12-84D8-0F35CAC309AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -46,10 +42,14 @@ Global
 		{BC901583-7389-4664-8689-01914477A731}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC901583-7389-4664-8689-01914477A731}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC901583-7389-4664-8689-01914477A731}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A9AE750B-1C54-4507-8CFD-97D9AD9C1517}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A9AE750B-1C54-4507-8CFD-97D9AD9C1517}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A9AE750B-1C54-4507-8CFD-97D9AD9C1517}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A9AE750B-1C54-4507-8CFD-97D9AD9C1517}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E8A96AC-2363-4716-8A6C-25C5B9F859A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E8A96AC-2363-4716-8A6C-25C5B9F859A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E8A96AC-2363-4716-8A6C-25C5B9F859A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E8A96AC-2363-4716-8A6C-25C5B9F859A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9243CBC8-5C4A-483B-BCD7-829D0C5D3227}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9243CBC8-5C4A-483B-BCD7-829D0C5D3227}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9243CBC8-5C4A-483B-BCD7-829D0C5D3227}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9243CBC8-5C4A-483B-BCD7-829D0C5D3227}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

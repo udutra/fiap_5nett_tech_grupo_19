@@ -49,3 +49,39 @@ services:
 
 networks:
   mynw:
+
+  fiap_5nett_tech.contact:
+    image: fiap_5nett_tech.contact
+    build:
+      context: .
+      dockerfile: fiap_5nett_tech.Contact/Dockerfile
+
+  fiap_5nett_tech.api.contact.create:
+    image: fiap_5nett_tech.api.contact.create
+    build:
+      context: .
+      dockerfile: fiap_5nett_tech.Api.Contact.Create/Dockerfile
+
+  fiap_5nett_tech.api.contact.create.consumer:
+    image: fiap_5nett_tech.api.contact.create.consumer
+    build:
+      context: .
+      dockerfile: fiap_5nett_tech.Api.Contact.Create.Consumer/Dockerfile
+
+  consoleapp1:
+    image: consoleapp1
+    build:
+      context: .
+      dockerfile: ConsoleApp1/Dockerfile
+
+  webapplication1:
+    image: webapplication1
+    build:
+      context: .
+      dockerfile: WebApplication1/Dockerfile
+
+  fiap_5nett_tech.api.contact.create.consumer:
+    image: fiap_5nett_tech.api.contact.create.consumer
+    build:
+      context: .
+      dockerfile: fiap_5nett_tech.Api.Contact.Create.Consumer/Dockerfile
