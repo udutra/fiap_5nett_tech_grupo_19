@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.Json;
 using Azure;
+using fiap_5nett_tech.api.Consumers;
 using fiap_5nett_tech.api.Interfaces;
 using fiap_5nett_tech.Application;
 using fiap_5nett_tech.Application.DataTransfer.Request;
@@ -18,9 +19,11 @@ namespace fiap_5nett_tech.api.Controllers;
 public class ContactController : ControllerBase
 {
     private readonly IContactInterface _contactInterface;
-    public ContactController(IContactInterface contactInterface)
+    private readonly RabbitMqAddUserConsumer _rabbitMqConsumer;
+    public ContactController(IContactInterface contactInterface, RabbitMqAddUserConsumer rabbitMqConsumer)
     {
         _contactInterface = contactInterface;
+        _rabbitMqConsumer = rabbitMqConsumer;
     }
 
     /// <summary>
@@ -72,6 +75,7 @@ public class ContactController : ControllerBase
 
         return Ok();
     }
+
 
     /// <summary>
     /// Atualiza um contato existente.
