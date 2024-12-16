@@ -1,6 +1,4 @@
 ﻿using fiap_5nett_tech.Application.Interface;
-using fiap_5nett_tech.Application.Service;
-using fiap_5nett_tech.Domain.Repositories;
 
 namespace fiap_5nett_tech.Api.Contact.Create.Consumer.Services;
 

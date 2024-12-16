@@ -9,7 +9,9 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContextFactory<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlServerOptionsAction => sqlServerOptionsAction.EnableRetryOnFailure())
+    , ServiceLifetime.Scoped);
 
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();

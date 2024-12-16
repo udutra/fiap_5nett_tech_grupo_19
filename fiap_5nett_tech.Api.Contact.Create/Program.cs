@@ -1,4 +1,5 @@
 using System.Reflection;
+using fiap_5nett_tech.Api.Contact.Create;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,7 @@ builder.Services.AddSwaggerGen(c => {
         var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
         c.IncludeXmlComments(xmlPath);
     });
+
 
 var app = builder.Build();
 

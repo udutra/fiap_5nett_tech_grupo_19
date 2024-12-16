@@ -7,10 +7,11 @@ using fiap_5nett_tech.Domain.RabbitMqConfiguration;
 using fiap_5nett_tech.Domain.Repositories;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using RabbitMQ.Client.Exceptions;
 
 namespace fiap_5nett_tech.Api.Contact.Create.Consumer;
 
-public class Worker: IDisposable {
+public class Worker : IDisposable {
     
     private readonly IConnection connection;
     private readonly IChannel channel;
@@ -44,13 +45,19 @@ public class Worker: IDisposable {
     
     public async Task Start() {
 
-            ContactRequest? contactRequest;
+            //channel.BasicQosAsync(0, 1, false);
+            await channel.BasicQosAsync(0, 1, false);
             
             var consumer = new AsyncEventingBasicConsumer(channel);
-            consumer.ReceivedAsync += async (_, eventArgs) => {
-                var body = eventArgs.Body.ToArray();
+            consumer.ReceivedAsync += async (_, ea) => {
+                var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
-                contactRequest = JsonSerializer.Deserialize<ContactRequest>(message);
+                var props = ea.BasicProperties;
+                var replyProps = new BasicProperties {
+                    CorrelationId = props.CorrelationId
+                };
+
+                var contactRequest = JsonSerializer.Deserialize<ContactRequest>(message);
 
                 try
                 {
@@ -59,7 +66,6 @@ public class Worker: IDisposable {
                         throw new NullReferenceException("Contato não pode ser nulo.");
                     }
                     
-                    ContactService.Create(contactRequest);
                     //await channel.BasicAckAsync(eventArgs.DeliveryTag, false);
                     Console.WriteLine("contato lido");
                 }
@@ -67,17 +73,51 @@ public class Worker: IDisposable {
                     
                     //Se der erro, reenvia a mensagem para a fila
                     //await channel.BasicNacksAsync(eventArgs.DeliveryTag, false, );
+                    await channel.BasicRejectAsync(deliveryTag: ea.DeliveryTag, requeue: false);
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.GetBaseException());
+                    Console.WriteLine(ex.Message);
+                    await channel.BasicRejectAsync(deliveryTag: ea.DeliveryTag, requeue: false);
+                    throw;
+                }
+                
+                try
+                {
+                    var contactResponse = ContactService.Create(contactRequest);
+                    var m = JsonSerializer.Serialize(contactResponse);
+                    var responseBytes = Encoding.UTF8.GetBytes(m);
+                    await channel.BasicPublishAsync(exchange: string.Empty, routingKey: props.ReplyTo!, mandatory: true, basicProperties: replyProps, body: responseBytes);
+                    await channel.BasicAckAsync(deliveryTag: ea.DeliveryTag, multiple: false);
+                }
+                catch (AlreadyClosedException ex)
+                {
+                    //Log
+                    Console.WriteLine("AlreadyClosedException");
+                    Console.WriteLine(ex.Message);
+                    await channel.BasicNackAsync(deliveryTag: ea.DeliveryTag, multiple: false, requeue: true);
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    //Log
+                    Console.WriteLine(ex.GetBaseException());
+                    Console.WriteLine(ex.Message);
+                    await channel.BasicNackAsync(deliveryTag: ea.DeliveryTag, multiple: false, requeue: true);
+                    throw;
                 }
                 
                 await Task.CompletedTask;
             };
 
-            await channel.BasicConsumeAsync(queue: QueueConfiguration.ContactCreatedQueue, autoAck: true, consumer: consumer);
+            await channel.BasicConsumeAsync(queue: QueueConfiguration.ContactCreatedQueue, autoAck: false, consumer: consumer);
     }
+  
 
     public void Dispose()
     {
-        channel.CloseAsync();
-        connection.CloseAsync();
+        throw new NotImplementedException();
     }
 }
