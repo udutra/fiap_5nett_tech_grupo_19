@@ -1,5 +1,5 @@
 using System.Reflection;
-using fiap_5nett_tech.Api.Contact.Update.Services;
+using fiap_5nett_tech.Api.Contact.Read.Services;
 using fiap_5nett_tech.Application.Interface;
 using fiap_5nett_tech.Application.Service;
 using fiap_5nett_tech.Domain.Repositories;
@@ -18,16 +18,16 @@ builder.Services.AddDbContextFactory<AppDbContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => {
-        c.SwaggerDoc("v1", new OpenApiInfo { Title = "Tech Challenge 1", Version = "" });
-        var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-        c.IncludeXmlComments(xmlPath);
-    });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Tech Challenge 1", Version = "" });
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
+});
 
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();
 builder.Services.AddScoped<IContactInterface, ContactService>();
-builder.Services.AddHostedService<RabbitMqUpdateContactConsumerCs>();
+builder.Services.AddHostedService<RabbitMqReadContactConsumerCs>();
 
 var app = builder.Build();
 
@@ -48,4 +48,7 @@ if (app.Environment.IsDevelopment())
 
 app.Run();
 
+/// <summary>
+/// 
+/// </summary>
 public partial class Program { }

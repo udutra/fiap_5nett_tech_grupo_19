@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="RabbitMQ.Client" Version="7.0.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\fiap_5nett_tech.Application\fiap_5nett_tech.Application.csproj" />
+        <ProjectReference Include="..\fiap_5nett_tech.Domain\fiap_5nett_tech.Domain.csproj" />
+        <ProjectReference Include="..\fiap_5nett_tech.Infrastructure\fiap_5nett_tech.Infrastructure.csproj" />
+    </ItemGroup>
+
+</Project>

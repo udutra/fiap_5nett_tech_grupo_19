@@ -16,15 +16,14 @@ namespace fiap_5nett_tech.Api.Contact.Update.Controllers;
 public class UpdateContactController : ControllerBase
 {
 
-    private IConnection? _connection;
-    private IChannel? _channel;
-    private readonly IConnectionFactory connectionFactory;
+    private readonly IConnection? _connection;
+    private readonly IChannel? _channel;
     private readonly ConcurrentDictionary<string, TaskCompletionSource<string>> _callbackMapper = new();
-    private const string _replyQueueName = QueueConfiguration.ContactUpdatedQueueReturn;
+    private const string ReplyQueueName = QueueConfiguration.ContactUpdatedQueueReturn;
 
     public UpdateContactController()
     {
-        connectionFactory = new ConnectionFactory
+        var connectionFactory = new ConnectionFactory
         {
             Uri = new Uri(@"amqp://guest:guest@127.0.0.1:5672/"),
             NetworkRecoveryInterval = TimeSpan.FromSeconds(10),
@@ -42,7 +41,7 @@ public class UpdateContactController : ControllerBase
             throw new InvalidOperationException();
         }
 
-        await _channel.QueueDeclareAsync(queue: _replyQueueName, durable: false, exclusive: true, autoDelete: true, arguments: null);
+        await _channel.QueueDeclareAsync(queue: ReplyQueueName, durable: false, exclusive: true, autoDelete: true, arguments: null);
 
         var consumer = new AsyncEventingBasicConsumer(_channel);
 
@@ -62,25 +61,26 @@ public class UpdateContactController : ControllerBase
             return Task.CompletedTask;
         };
 
-        await _channel.BasicConsumeAsync(_replyQueueName, true, consumer);
+        await _channel.BasicConsumeAsync(ReplyQueueName, true, consumer);
     }
 
 
     /// <summary>
     /// Cria um novo contato.
     /// </summary>
-    /// <param name="contactRequest">O objeto de solicitaÁ„o de criaÁ„o do contato.</param>
+    /// <param name="contactRequest">O objeto de solicita√ß√£o de cria√ß√£o do contato.</param>
+    /// <param name="cancellationToken">Token de cancelamento</param>
     /// <response code="200">Retorna o novo contato criado.</response>
-    /// <response code="400">SolicitaÁ„o inv·lida.</response>
+    /// <response code="400">Solicita√ß√£o inv√°lida.</response>
     /// <response code="500">Houve um erro interno no servidor.</response>
-    /// <returns>Uma resposta de contato recÈm-criada.</returns>
+    /// <returns>Uma resposta de contato rec√©m-criada.</returns>
     [HttpPost]
     public async Task<IActionResult> Update([FromBody] ContactRequest contactRequest, CancellationToken cancellationToken = default)
     {
 
         if (!ModelState.IsValid)
         {
-            return StatusCode(StatusCodes.Status400BadRequest, "Campo(s) inv·lido(s) - BadRequest");
+            return StatusCode(StatusCodes.Status400BadRequest, "Campo(s) inv√°lido(s) - BadRequest");
         }
         if (_channel is null)
         {
@@ -90,9 +90,12 @@ public class UpdateContactController : ControllerBase
         await StartConsumerAsync();
         try
         {
-            await _channel.ExchangeDeclareAsync(exchange: ExchangeConfiguration.Name, type: "direct", durable: true, autoDelete: false, arguments: null, cancellationToken: cancellationToken);
-            await _channel.QueueDeclareAsync(queue: QueueConfiguration.ContactUpdatedQueue, durable: false, exclusive: false, autoDelete: false, arguments: null, cancellationToken: cancellationToken);
-            await _channel.QueueBindAsync(queue: QueueConfiguration.ContactUpdatedQueue, exchange: ExchangeConfiguration.Name, routingKey: RoutingKeyConfiguration.RoutingQueueUpdate, arguments: null, cancellationToken: cancellationToken);
+            await _channel.ExchangeDeclareAsync(exchange: ExchangeConfiguration.Name, type: "direct", durable: true, autoDelete: false, arguments: null, 
+                cancellationToken: cancellationToken);
+            await _channel.QueueDeclareAsync(queue: QueueConfiguration.ContactUpdatedQueue, durable: false, exclusive: false, autoDelete: false, arguments: null, 
+                cancellationToken: cancellationToken);
+            await _channel.QueueBindAsync(queue: QueueConfiguration.ContactUpdatedQueue, exchange: ExchangeConfiguration.Name, 
+                routingKey: RoutingKeyConfiguration.RoutingQueueUpdate, arguments: null, cancellationToken: cancellationToken);
 
             var correlationId = Guid.NewGuid().ToString();
             var props = new BasicProperties
@@ -101,7 +104,7 @@ public class UpdateContactController : ControllerBase
                 ContentEncoding = "utf-8",
                 DeliveryMode = DeliveryModes.Persistent,
                 CorrelationId = correlationId,
-                ReplyTo = _replyQueueName
+                ReplyTo = ReplyQueueName
             };
 
             var tcs = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -124,15 +127,28 @@ public class UpdateContactController : ControllerBase
                 tcs.SetCanceled(cancellationToken);
             });
 
-            var result = tcs.Task.Result;
-
-            var response = JsonSerializer.Deserialize<ContactResponse<Domain.Entities.Contact>>(result);
-
-            return response.IsSuccess ? Ok(response) : Problem(null, null, 500, response.Message);
+            try
+            {
+                var response = JsonSerializer.Deserialize<ContactResponse<Domain.Entities.Contact>>(tcs.Task.Result);
+                await DisposeAsync();
+                if (response == null)
+                {
+                    return Problem(null, null, 500, "Erro interno do servidor - Response nulo"); 
+                }
+                return response.IsSuccess ? Ok(response) : Problem(null, null, 500, response.Message);
+            }
+            catch (ArgumentNullException e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro interno do servidor - ArgumentNullException" + e.Message);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro interno do servidor - Exception" + e.Message);
+            }
         }
         catch (BrokerUnreachableException e)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, "Erro interno do servidor - BrokerUnreachableException");
+            return StatusCode(StatusCodes.Status500InternalServerError, "Erro interno do servidor - BrokerUnreachableException" + e.Message);
         }
         catch (Exception e)
         {
