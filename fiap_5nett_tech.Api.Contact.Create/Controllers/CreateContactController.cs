@@ -39,7 +39,7 @@ public class ContactController : ControllerBase {
             throw new InvalidOperationException();
         }
         
-        await _channel.QueueDeclareAsync(queue: _replyQueueName, durable: false, exclusive: false, autoDelete: true, arguments: null);
+        await _channel.QueueDeclareAsync(queue: _replyQueueName, durable: false, exclusive: true, autoDelete: true, arguments: null);
 
         var consumer = new AsyncEventingBasicConsumer(_channel);
         
