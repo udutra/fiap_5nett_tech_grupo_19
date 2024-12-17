@@ -11,7 +11,7 @@ namespace fiap_5nett_tech.Api.Contact.Read.Services;
 /// <summary>
 /// 
 /// </summary>
-public class Worker : IDisposable
+public class WorkerGetOneById : IDisposable
 {
     private readonly IConnection? _connection;
     private readonly IChannel? _channel;
@@ -23,7 +23,7 @@ public class Worker : IDisposable
     /// </summary>
     /// <param name="contactService"></param>
     /// <param name="serviceScopeFactory"></param>
-    public Worker(IContactInterface contactService, IServiceScopeFactory serviceScopeFactory)
+    public WorkerGetOneById(IContactInterface contactService, IServiceScopeFactory serviceScopeFactory)
     {
         var factory = new ConnectionFactory
         {
@@ -44,19 +44,7 @@ public class Worker : IDisposable
         
         _channel.QueueDeclareAsync(queue: QueueConfiguration.ContactReadQueueGetOneById, durable: false, exclusive: false, autoDelete: false, arguments: null);
         _channel.QueueBindAsync(queue: QueueConfiguration.ContactReadQueueGetOneById, exchange: ExchangeConfiguration.Name, 
-            routingKey: RoutingKeyConfiguration.RoutingReadCreateGetOneById, arguments: null);
-
-        _channel.QueueDeclareAsync(queue: QueueConfiguration.ContactReadQueueGetOneByDddAndPhone, durable: false, exclusive: false, autoDelete: false, arguments: null);
-        _channel.QueueBindAsync(queue: QueueConfiguration.ContactReadQueueGetOneByDddAndPhone, exchange: ExchangeConfiguration.Name, 
-            routingKey: RoutingKeyConfiguration.RoutingReadCreateGetOneByDddAndPhone, arguments: null);
-
-        _channel.QueueDeclareAsync(queue: QueueConfiguration.ContactReadQueueGetAll, durable: false, exclusive: false, autoDelete: false, arguments: null);
-        _channel.QueueBindAsync(queue: QueueConfiguration.ContactReadQueueGetAll, exchange: ExchangeConfiguration.Name, 
-            routingKey: RoutingKeyConfiguration.RoutingReadCreateGetAll, arguments: null);
-        
-        _channel.QueueDeclareAsync(queue: QueueConfiguration.ContactReadQueueGetAllByDdd, durable: false, exclusive: false, autoDelete: false, arguments: null);
-        _channel.QueueBindAsync(queue: QueueConfiguration.ContactReadQueueGetAllByDdd, exchange: ExchangeConfiguration.Name, 
-            routingKey: RoutingKeyConfiguration.RoutingReadCreateGetAllByDdd, arguments: null);
+            routingKey: RoutingKeyConfiguration.RoutingQueueReadGetOneById, arguments: null);
         
         _contactService = contactService;
         ServiceScopeFactory = serviceScopeFactory;
@@ -123,7 +111,7 @@ public class Worker : IDisposable
 
             await Task.CompletedTask;
         };
-        await _channel.BasicConsumeAsync(queue: QueueConfiguration.ContactUpdatedQueue, autoAck: false,
+        await _channel.BasicConsumeAsync(queue: QueueConfiguration.ContactReadQueueGetOneById, autoAck: false,
             consumer: consumer);
     }
     

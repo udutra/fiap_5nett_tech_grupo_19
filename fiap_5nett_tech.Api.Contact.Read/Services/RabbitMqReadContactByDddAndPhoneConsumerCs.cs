@@ -6,9 +6,9 @@ namespace fiap_5nett_tech.Api.Contact.Read.Services;
 /// 
 /// </summary>
 /// <param name="scopeFactory"></param>
-public class RabbitMqReadContactConsumerCs(IServiceScopeFactory scopeFactory) : IHostedService
+public class RabbitMqReadContactByDddAndPhoneConsumerCs(IServiceScopeFactory scopeFactory) : IHostedService
 {
-    private Worker _consumer;
+    private WorkerGetOneByDddAndPhone _consumerGetOneByDddAndPhone;
     private IServiceScope _scope;
 
     /// <summary>
@@ -22,8 +22,8 @@ public class RabbitMqReadContactConsumerCs(IServiceScopeFactory scopeFactory) : 
         var contactService = _scope.ServiceProvider.GetRequiredService<IContactInterface>();
         var serviceScopeFactory = _scope.ServiceProvider.GetService<IServiceScopeFactory>();
 
-        _consumer = new Worker(contactService, serviceScopeFactory);
-        _consumer.Start();
+        _consumerGetOneByDddAndPhone = new WorkerGetOneByDddAndPhone(contactService, serviceScopeFactory);
+        _consumerGetOneByDddAndPhone.Start();
 
         return Task.CompletedTask;
     }
@@ -35,7 +35,7 @@ public class RabbitMqReadContactConsumerCs(IServiceScopeFactory scopeFactory) : 
     /// <returns></returns>
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        _consumer.Dispose();
+        _consumerGetOneByDddAndPhone.Dispose();
         _scope.Dispose();
         return Task.CompletedTask;
     }

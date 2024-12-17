@@ -109,7 +109,7 @@ public class ReadContactController : ControllerBase
                 cancellationToken: cancellationToken);
             await _channel.QueueBindAsync(queue: QueueConfiguration.ContactReadQueueGetOneById,
                 exchange: ExchangeConfiguration.Name,
-                routingKey: RoutingKeyConfiguration.RoutingReadCreateGetOneById, arguments: null,
+                routingKey: RoutingKeyConfiguration.RoutingQueueReadGetOneById, arguments: null,
                 cancellationToken: cancellationToken);
 
             var correlationId = Guid.NewGuid().ToString();
@@ -130,7 +130,7 @@ public class ReadContactController : ControllerBase
 
             await _channel.BasicPublishAsync(
                 exchange: ExchangeConfiguration.Name,
-                routingKey: RoutingKeyConfiguration.RoutingQueueUpdate,
+                routingKey: RoutingKeyConfiguration.RoutingQueueReadGetOneById,
                 mandatory: true,
                 basicProperties: props,
                 body,
@@ -175,6 +175,111 @@ public class ReadContactController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Obtém um contato pelo DDD e número de telefone.
+    /// </summary>
+    /// <param name="ddd">DDD do contato.</param>
+    /// <param name="telefone">Número de telefone do contato.</param>
+    /// <response code="200">Retorna o contato se encontrado.</response>
+    /// <response code="400">Se o contato não for encontrado.</response>
+    /// <response code="500">Houve um erro interno no servidor.</response>
+    /// <returns>Um objeto de resposta de contato.</returns>
+    [HttpGet]
+    [Route("{ddd:int}/{telefone}")]
+    public async Task<ActionResult<ContactResponse<Domain.Entities.Contact?>>> GetOne([FromRoute] int ddd,
+        [FromRoute] string telefone, CancellationToken cancellationToken = default)
+    {
+        if (!ModelState.IsValid) {
+            return StatusCode(StatusCodes.Status400BadRequest, "Campo(s) inválido(s) - BadRequest");
+        }
+
+        if (_channel is null) {
+            throw new InvalidOperationException();
+        }
+
+        await StartConsumerAsync(ReplyQueueNameGetOnByDddAndPhone);
+        try
+        {
+            await _channel.ExchangeDeclareAsync(exchange: ExchangeConfiguration.Name, type: "direct", durable: true,
+                autoDelete: false, arguments: null,
+                cancellationToken: cancellationToken);
+            await _channel.QueueDeclareAsync(queue: QueueConfiguration.ContactReadQueueGetOneByDddAndPhone, durable: false,
+                exclusive: false, autoDelete: false, arguments: null,
+                cancellationToken: cancellationToken);
+            await _channel.QueueBindAsync(queue: QueueConfiguration.ContactReadQueueGetOneByDddAndPhone,
+                exchange: ExchangeConfiguration.Name,
+                routingKey: RoutingKeyConfiguration.RoutingQueueReadGetOneByDddAndPhone, arguments: null,
+                cancellationToken: cancellationToken);
+
+            var correlationId = Guid.NewGuid().ToString();
+            var props = new BasicProperties
+            {
+                ContentType = "application/json",
+                ContentEncoding = "utf-8",
+                DeliveryMode = DeliveryModes.Persistent,
+                CorrelationId = correlationId,
+                ReplyTo = ReplyQueueNameGetOnByDddAndPhone
+            };
+
+            var tcs = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
+            _callbackMapper.TryAdd(correlationId, tcs);
+            
+            var contact = new Domain.Entities.Contact
+            {
+                Ddd = ddd,
+                Phone = telefone
+            };
+            
+            var message = JsonSerializer.Serialize(contact);
+            var body = Encoding.UTF8.GetBytes(message);
+
+            await _channel.BasicPublishAsync(
+                exchange: ExchangeConfiguration.Name,
+                routingKey: RoutingKeyConfiguration.RoutingQueueReadGetOneByDddAndPhone,
+                mandatory: true,
+                basicProperties: props,
+                body,
+                cancellationToken: cancellationToken);
+
+            //retorno da mensagem
+            await using var ctr = cancellationToken.Register(() =>
+            {
+                _callbackMapper.TryRemove(correlationId, out _);
+                tcs.SetCanceled(cancellationToken);
+            });
+
+            try
+            {
+                var response = JsonSerializer.Deserialize<ContactResponse<Domain.Entities.Contact?>?>(tcs.Task.Result);
+                await DisposeAsync();
+                if (response == null)
+                {
+                    return Problem(null, null, 500, "Erro interno do servidor - Response nulo");
+                }
+
+                return response.IsSuccess ? Ok(response) : Problem(null, null, 500, response.Message);
+            }
+            catch (ArgumentNullException e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Erro interno do servidor - ArgumentNullException" + e.Message);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Erro interno do servidor - Exception" + e.Message);
+            }
+        }
+        catch (BrokerUnreachableException e)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "Erro interno do servidor - BrokerUnreachableException" + e.Message);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "Erro interno do servidor - Exception" + e.Message);
+        }
+    }
+    
     private async ValueTask DisposeAsync()
     {
         if (_channel is not null)

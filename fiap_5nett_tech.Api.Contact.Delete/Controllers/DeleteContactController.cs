@@ -128,7 +128,7 @@ public class DeleteContactController : ControllerBase
 
             await _channel.BasicPublishAsync(
                 exchange: ExchangeConfiguration.Name,
-                routingKey: RoutingKeyConfiguration.RoutingQueueUpdate,
+                routingKey: RoutingKeyConfiguration.RoutingQueueDelete,
                 mandatory: true,
                 basicProperties: props,
                 body,

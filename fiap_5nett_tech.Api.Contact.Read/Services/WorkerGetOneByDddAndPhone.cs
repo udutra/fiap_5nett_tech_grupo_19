@@ -1,25 +1,29 @@
 ﻿using System.Text;
 using System.Text.Json;
-using fiap_5nett_tech.Application.DataTransfer.Request;
 using fiap_5nett_tech.Application.Interface;
 using fiap_5nett_tech.Domain.RabbitMqConfiguration;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 
-namespace fiap_5nett_tech.Api.Contact.Delete.Services;
+namespace fiap_5nett_tech.Api.Contact.Read.Services;
 
 /// <summary>
 /// 
 /// </summary>
-public class Worker : IDisposable
+public class WorkerGetOneByDddAndPhone : IDisposable
 {
     private readonly IConnection? _connection;
     private readonly IChannel? _channel;
-    private readonly IContactInterface ContactService;
+    private readonly IContactInterface _contactService;
     private readonly IServiceScopeFactory ServiceScopeFactory;
     
-    public Worker(IContactInterface contactService, IServiceScopeFactory serviceScopeFactory)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="contactService"></param>
+    /// <param name="serviceScopeFactory"></param>
+    public WorkerGetOneByDddAndPhone(IContactInterface contactService, IServiceScopeFactory serviceScopeFactory)
     {
         var factory = new ConnectionFactory
         {
@@ -37,12 +41,12 @@ public class Worker : IDisposable
 
         _channel.ExchangeDeclareAsync(exchange: ExchangeConfiguration.Name, type: "direct", durable: true,
             autoDelete: false, arguments: null);
-        _channel.QueueDeclareAsync(queue: QueueConfiguration.ContactDeletedQueue, durable: false, exclusive: false,
-            autoDelete: false, arguments: null);
-        _channel.QueueBindAsync(queue: QueueConfiguration.ContactDeletedQueue, exchange: ExchangeConfiguration.Name,
-            routingKey: RoutingKeyConfiguration.RoutingQueueDelete, arguments: null);
-
-        ContactService = contactService;
+        
+        _channel.QueueDeclareAsync(queue: QueueConfiguration.ContactReadQueueGetOneByDddAndPhone, durable: false, exclusive: false, autoDelete: false, arguments: null);
+        _channel.QueueBindAsync(queue: QueueConfiguration.ContactReadQueueGetOneByDddAndPhone, exchange: ExchangeConfiguration.Name, 
+            routingKey: RoutingKeyConfiguration.RoutingQueueReadGetOneByDddAndPhone, arguments: null);
+        
+        _contactService = contactService;
         ServiceScopeFactory = serviceScopeFactory;
     }
     
@@ -64,11 +68,12 @@ public class Worker : IDisposable
             {
                 CorrelationId = props.CorrelationId
             };
-            
-            var contact = JsonSerializer.Deserialize<Domain.Entities.Contact>(message);
+
+            Domain.Entities.Contact? contact;
             
             try
             {
+                contact = JsonSerializer.Deserialize<Domain.Entities.Contact>(message);
                 if (contact == null)
                 {
                     throw new NullReferenceException("Contato não pode ser nulo.");
@@ -87,7 +92,7 @@ public class Worker : IDisposable
             
             try
             {
-                var contactResponse = ContactService.Delete(contact.Ddd, contact.Phone);
+                var contactResponse = _contactService.GetOne(contact.Ddd, contact.Phone);
                 var m = JsonSerializer.Serialize(contactResponse);
                 var responseBytes = Encoding.UTF8.GetBytes(m);
                 await _channel.BasicPublishAsync(exchange: string.Empty, routingKey: props.ReplyTo!, mandatory: true,
@@ -106,10 +111,14 @@ public class Worker : IDisposable
 
             await Task.CompletedTask;
         };
-        await _channel.BasicConsumeAsync(queue: QueueConfiguration.ContactDeletedQueue, autoAck: false,
+        await _channel.BasicConsumeAsync(queue: QueueConfiguration.ContactReadQueueGetOneByDddAndPhone, autoAck: false,
             consumer: consumer);
     }
     
+    
+    /// <summary>
+    /// 
+    /// </summary>
     public void Dispose()
     {
         _channel?.CloseAsync();
