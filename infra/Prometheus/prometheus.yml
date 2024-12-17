@@ -1,0 +1,25 @@
+﻿global:
+  scrape_interval: 10s
+  evaluation_interval: 15s
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+rule_files:
+
+scrape_configs:
+  - job_name: 'Api.Contact.Create'
+    static_configs:
+      - targets: ['host.docker.internal:5151']
+  - job_name: 'Api.Contact.Read'
+    static_configs:
+      - targets: [ 'host.docker.internal:5166']
+  - job_name: 'Api.Contact.Update'
+    static_configs:
+      - targets: [ 'host.docker.internal:5092' ]
+  - job_name: 'Api.Contact.Delete'
+    static_configs:
+      - targets: [ 'host.docker.internal:5149' ]
+  - job_name: 'RabbitMQ'
+    static_configs:
+      - targets: ['host.docker.internal:15692']

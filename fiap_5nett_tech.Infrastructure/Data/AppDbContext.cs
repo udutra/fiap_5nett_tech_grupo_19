@@ -9,7 +9,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
 {
     public DbSet<Contact> Contacts { get; set; }
     public DbSet<Region> Regions { get; set; }
-
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new ContactMapping());

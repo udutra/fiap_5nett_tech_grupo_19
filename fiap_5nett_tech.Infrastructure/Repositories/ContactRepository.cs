@@ -2,29 +2,17 @@
 using fiap_5nett_tech.Domain.Repositories;
 using System.Data.Common;
 using fiap_5nett_tech.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
 
 namespace fiap_5nett_tech.Infrastructure.Repositories
 {
-    public class ContactRepository : IContactRepository
-    {
-        private readonly AppDbContext _context;
-
-        public ContactRepository(AppDbContext context)
-        {
-            _context = context;
-        }
-
-        public void Create(Contact contact)
-        {
-            try
-            {
-                _context.Contacts.Add(contact);
-                _context.SaveChanges();
+    public class ContactRepository(AppDbContext context) : IContactRepository {
+        public void Create(Contact contact) {
+            try {
+                context.Contacts.Add(contact);
+                context.SaveChanges();
             }
-            catch (DbException ex)
-            {
+            catch (DbException ex) {
                 Console.WriteLine(ex.Message);
             }
         }
@@ -33,8 +21,8 @@ namespace fiap_5nett_tech.Infrastructure.Repositories
         {
             try
             {
-                _context.Contacts.Update(contact);
-                _context.SaveChanges();
+                context.Contacts.Update(contact);
+                context.SaveChanges();
             }
             catch (DbException ex)
             {
@@ -47,15 +35,15 @@ namespace fiap_5nett_tech.Infrastructure.Repositories
         {
             try
             {
-                var contact = _context.Contacts.FirstOrDefault(x => x.Region.Ddd == ddd && x.Phone == telefone);
+                var contact = context.Contacts.FirstOrDefault(x => x.Region.Ddd == ddd && x.Phone == telefone);
 
                 if (contact is null)
                 {
                     return null;
 
                 }
-                _context.Contacts.Remove(contact);
-                _context.SaveChanges();
+                context.Contacts.Remove(contact);
+                context.SaveChanges();
                 return contact;
 
             }
@@ -70,7 +58,7 @@ namespace fiap_5nett_tech.Infrastructure.Repositories
         {
             try
             {
-                var contacts = _context.Contacts.AsQueryable();
+                var contacts = context.Contacts.AsQueryable();
 
                 if (!string.IsNullOrWhiteSpace(nome))
                 {
@@ -105,7 +93,7 @@ namespace fiap_5nett_tech.Infrastructure.Repositories
         {
             try
             {
-                return _context
+                return context
                     .Contacts
                     .FirstOrDefault(x => x.Id == id);
             }
@@ -120,7 +108,7 @@ namespace fiap_5nett_tech.Infrastructure.Repositories
         {
             try
             {
-                return _context
+                return context
                     .Contacts
                     .FirstOrDefault(x => x.Region.Ddd == ddd && x.Phone == telefone);
             }
