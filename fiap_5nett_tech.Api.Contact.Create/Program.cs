@@ -7,6 +7,7 @@ using fiap_5nett_tech.Infrastructure.Data;
 using fiap_5nett_tech.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,22 @@ builder.Services.AddScoped<IContactInterface, ContactService>();
 builder.Services.AddHostedService<RabbitMqAddContactConsumerCs>();
 
 var app = builder.Build();
+
+//Prometheus
+var counter = Metrics.CreateCounter("webapimetricCreate", "count requests to the Web Api Create Endpoint",
+    new CounterConfiguration()
+    {
+        LabelNames = new[] { "method", "endpoint" }
+    });
+
+app.Use((context, next) =>
+{
+    counter.WithLabels(context.Request.Method, context.Request.Path).Inc();
+    return next();
+});
+
+app.UseMetricServer();
+app.UseHttpMetrics();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
