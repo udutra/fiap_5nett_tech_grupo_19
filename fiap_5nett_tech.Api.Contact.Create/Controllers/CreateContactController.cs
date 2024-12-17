@@ -13,7 +13,7 @@ namespace fiap_5nett_tech.Api.Contact.Create.Controllers;
 
 [ApiController]
 [Route("api/[controller]/")]
-public class ContactController : ControllerBase {
+public class CreateContactController : ControllerBase {
     
     private IConnection? _connection;
     private IChannel? _channel;
@@ -21,7 +21,7 @@ public class ContactController : ControllerBase {
     private readonly ConcurrentDictionary<string, TaskCompletionSource<string>> _callbackMapper = new();
     private const string _replyQueueName = QueueConfiguration.ContactCreatedQueueReturn;
     
-    public ContactController()
+    public CreateContactController()
     {
         connectionFactory = new ConnectionFactory  {
             Uri = new Uri(@"amqp://guest:guest@127.0.0.1:5672/"),
@@ -83,7 +83,7 @@ public class ContactController : ControllerBase {
             throw new InvalidOperationException();
         }
         
-        StartConsumerAsync();
+        await StartConsumerAsync();
         try
         {
             await _channel.ExchangeDeclareAsync(exchange: ExchangeConfiguration.Name, type: "direct", durable: true, autoDelete: false, arguments: null, cancellationToken: cancellationToken);
