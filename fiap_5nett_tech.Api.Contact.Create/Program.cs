@@ -7,7 +7,10 @@ using fiap_5nett_tech.Infrastructure.Data;
 using fiap_5nett_tech.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using OpenTelemetry.Metrics;
 using Prometheus;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +18,22 @@ builder.Services.AddDbContextFactory<AppDbContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
             sqlServerOptionsAction => sqlServerOptionsAction.EnableRetryOnFailure())
     , ServiceLifetime.Scoped);
+
+builder.Services.UseHttpClientMetrics();
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(b =>
+    {
+        b.AddPrometheusExporter();
+        b.AddAspNetCoreInstrumentation();
+        b.AddRuntimeInstrumentation();
+        b.AddHttpClientInstrumentation();
+        // Metrics provider from OpenTelemetry
+        b.AddAspNetCoreInstrumentation();
+        //.AddMeter(greeterMeter.Name)
+        // Metrics provides by ASP.NET Core in .NET 8
+        b.AddMeter("Microsoft.AspNetCore.Hosting");
+        b.AddMeter("Microsoft.AspNetCore.Server.Kestrel");
+    });
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -32,11 +51,13 @@ builder.Services.AddHostedService<RabbitMqAddContactConsumerCs>();
 
 var app = builder.Build();
 
+app.MapPrometheusScrapingEndpoint();
+
 //Prometheus
 var counter = Metrics.CreateCounter("webapimetricCreate", "count requests to the Web Api Create Endpoint",
     new CounterConfiguration()
     {
-        LabelNames = new[] { "method", "endpoint" }
+        LabelNames = ["method", "endpoint"]
     });
 
 app.Use((context, next) =>
@@ -47,9 +68,7 @@ app.Use((context, next) =>
 
 app.UseMetricServer();
 app.UseHttpMetrics();
-
-//app.UseHttpsRedirection();
-//app.UseStaticFiles();
+app.MapPrometheusScrapingEndpoint();
 app.UseRouting();
 app.UseAuthorization();
 
