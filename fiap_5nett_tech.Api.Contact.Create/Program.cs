@@ -51,8 +51,6 @@ builder.Services.AddHostedService<RabbitMqAddContactConsumerCs>();
 
 var app = builder.Build();
 
-app.MapPrometheusScrapingEndpoint();
-
 //Prometheus
 var counter = Metrics.CreateCounter("webapimetricCreate", "count requests to the Web Api Create Endpoint",
     new CounterConfiguration()

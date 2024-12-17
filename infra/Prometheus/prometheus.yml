@@ -14,6 +14,12 @@ scrape_configs:
   - job_name: 'Api.Contact.Read'
     static_configs:
       - targets: [ 'host.docker.internal:5166']
+  - job_name: 'Api.Contact.Update'
+    static_configs:
+      - targets: [ 'host.docker.internal:5092' ]
+  - job_name: 'Api.Contact.Delete'
+    static_configs:
+      - targets: [ 'host.docker.internal:5149' ]
   - job_name: 'RabbitMQ'
     static_configs:
       - targets: ['host.docker.internal:15692']
