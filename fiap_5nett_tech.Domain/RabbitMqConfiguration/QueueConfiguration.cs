@@ -14,8 +14,6 @@ public static class QueueConfiguration
     public const string ContactReadQueueGetAll = "contact_read_queue_get_all";
     public const string ContactReadQueueGetAllReturn = "contact_read_queue_get_all_return";
     
-    public const string ContactReadQueueGetAllByDdd = "contact_read_queue_get_all_by_ddd";
-    public const string ContactReadQueueGetGetAllByDddReturn = "contact_read_queue_get_all_by_ddd_return";
     
     public const string ContactUpdatedQueue = "contact_updated_queue";
     public const string ContactUpdatedQueueReturn = "contact_updated_queue_return";

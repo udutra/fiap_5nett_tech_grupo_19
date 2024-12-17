@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Text;
 using System.Text.Json;
+using fiap_5nett_tech.Application.DataTransfer.Request;
 using fiap_5nett_tech.Application.DataTransfer.Response;
 using fiap_5nett_tech.Domain.RabbitMqConfiguration;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +24,6 @@ public class ReadContactController : ControllerBase
     private const string ReplyQueueNameGetOnById = QueueConfiguration.ContactReadQueueGetOneByIdReturn;
     private const string ReplyQueueNameGetOnByDddAndPhone = QueueConfiguration.ContactReadQueueGetOneByDddAndPhoneReturn;
     private const string ReplyQueueNameGetAll = QueueConfiguration.ContactReadQueueGetAllReturn;
-    private const string ReplyQueueNameGetAllByDddReturn = QueueConfiguration.ContactReadQueueGetGetAllByDddReturn;
 
     /// <summary>
     /// 
@@ -180,6 +180,7 @@ public class ReadContactController : ControllerBase
     /// </summary>
     /// <param name="ddd">DDD do contato.</param>
     /// <param name="telefone">Número de telefone do contato.</param>
+    /// <param name="cancellationToken">Token de cancelamento</param>
     /// <response code="200">Retorna o contato se encontrado.</response>
     /// <response code="400">Se o contato não for encontrado.</response>
     /// <response code="500">Houve um erro interno no servidor.</response>
@@ -279,7 +280,105 @@ public class ReadContactController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, "Erro interno do servidor - Exception" + e.Message);
         }
     }
-    
+
+
+    /// <summary>
+    /// Obtém todos os contatos
+    /// </summary>
+    /// <param name="contactRequest">O objeto de solicitação para buscar todos os contatos.</param>
+    /// <param name="cancellationToken">Token de cancelamento</param>
+    /// <response code="200">Retorna uma lista paginada de contatos.</response>
+    /// <response code="400">Solicitação inválida.</response>
+    /// <response code="500">Houve um erro interno no servidor.</response>
+    /// <returns>Um objeto de resposta de contato paginado.</returns>
+    [HttpGet]
+    public async Task<PagedContactResponse<List<Domain.Entities.Contact>>> GetAll([FromQuery] GetAllContactRequest contactRequest,
+        CancellationToken cancellationToken = default)
+    {
+        if (!ModelState.IsValid)
+        {
+            return new PagedContactResponse<List<Domain.Entities.Contact>>(null, 400, "BadRequest");
+        }
+
+        if (_channel is null) {
+            throw new InvalidOperationException();
+        }
+
+        await StartConsumerAsync(ReplyQueueNameGetAll);
+        try
+        {
+            await _channel.ExchangeDeclareAsync(exchange: ExchangeConfiguration.Name, type: "direct", durable: true,
+                autoDelete: false, arguments: null,
+                cancellationToken: cancellationToken);
+            await _channel.QueueDeclareAsync(queue: QueueConfiguration.ContactReadQueueGetAll, durable: false,
+                exclusive: false, autoDelete: false, arguments: null,
+                cancellationToken: cancellationToken);
+            await _channel.QueueBindAsync(queue: QueueConfiguration.ContactReadQueueGetAll,
+                exchange: ExchangeConfiguration.Name,
+                routingKey: RoutingKeyConfiguration.RoutingQueueReadGetAll, arguments: null,
+                cancellationToken: cancellationToken);
+
+            var correlationId = Guid.NewGuid().ToString();
+            var props = new BasicProperties
+            {
+                ContentType = "application/json",
+                ContentEncoding = "utf-8",
+                DeliveryMode = DeliveryModes.Persistent,
+                CorrelationId = correlationId,
+                ReplyTo = ReplyQueueNameGetAll
+            };
+
+            var tcs = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
+            _callbackMapper.TryAdd(correlationId, tcs);
+            
+            var message = JsonSerializer.Serialize(contactRequest);
+            var body = Encoding.UTF8.GetBytes(message);
+
+            await _channel.BasicPublishAsync(
+                exchange: ExchangeConfiguration.Name,
+                routingKey: RoutingKeyConfiguration.RoutingQueueReadGetAll,
+                mandatory: true,
+                basicProperties: props,
+                body,
+                cancellationToken: cancellationToken);
+
+            //retorno da mensagem
+            await using var ctr = cancellationToken.Register(() =>
+            {
+                _callbackMapper.TryRemove(correlationId, out _);
+                tcs.SetCanceled(cancellationToken);
+            });
+
+            try
+            {
+                var response = JsonSerializer.Deserialize<PagedContactResponse<List<Domain.Entities.Contact>>>(tcs.Task.Result);
+                await DisposeAsync();
+                return response ?? 
+                       new PagedContactResponse<List<Domain.Entities.Contact>>(null, 500, 
+                           "Erro interno do servidor - Response nulo");
+            }
+            catch (ArgumentNullException e)
+            {
+                return new PagedContactResponse<List<Domain.Entities.Contact>>(null, 500, 
+                    "Erro interno do servidor - ArgumentNullException" + e.Message);
+            }
+            catch (Exception e)
+            {
+                return new PagedContactResponse<List<Domain.Entities.Contact>>(null, 500, 
+                    "Erro interno do servidor - Exception" + e.Message);
+            }
+        }
+        catch (BrokerUnreachableException e)
+        {
+            return new PagedContactResponse<List<Domain.Entities.Contact>>(null, 500, 
+                "Erro interno do servidor - BrokerUnreachableException" + e.Message);
+        }
+        catch (Exception e)
+        {
+            return new PagedContactResponse<List<Domain.Entities.Contact>>(null, 500, 
+                "Erro interno do servidor - Exception" + e.Message);
+        }
+    }
     private async ValueTask DisposeAsync()
     {
         if (_channel is not null)

@@ -27,8 +27,9 @@ builder.Services.AddSwaggerGen(c => {
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();
 builder.Services.AddScoped<IContactInterface, ContactService>();
-builder.Services.AddHostedService<RabbitMqReadContactByIdConsumerCs>();
-builder.Services.AddHostedService<RabbitMqReadContactByDddAndPhoneConsumerCs>();
+builder.Services.AddHostedService<RabbitMqReadContactGetOneByIdConsumerCs>();
+builder.Services.AddHostedService<RabbitMqReadContactGetOneByDddAndPhoneConsumerCs>();
+builder.Services.AddHostedService<RabbitMqReadContactGetAllConsumerCs>();
 
 var app = builder.Build();
 

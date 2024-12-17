@@ -6,7 +6,7 @@ namespace fiap_5nett_tech.Api.Contact.Read.Services;
 /// 
 /// </summary>
 /// <param name="scopeFactory"></param>
-public class RabbitMqReadContactByIdConsumerCs(IServiceScopeFactory scopeFactory) : IHostedService
+public class RabbitMqReadContactGetOneByIdConsumerCs(IServiceScopeFactory scopeFactory) : IHostedService
 {
     private WorkerGetOneById _consumerGetOneById;
     private IServiceScope _scope;
