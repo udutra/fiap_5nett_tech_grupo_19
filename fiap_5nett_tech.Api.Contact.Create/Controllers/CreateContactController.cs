@@ -15,15 +15,14 @@ namespace fiap_5nett_tech.Api.Contact.Create.Controllers;
 [Route("api/[controller]/")]
 public class CreateContactController : ControllerBase {
     
-    private IConnection? _connection;
-    private IChannel? _channel;
-    private readonly IConnectionFactory connectionFactory;
+    private readonly IConnection? _connection;
+    private readonly IChannel? _channel;
     private readonly ConcurrentDictionary<string, TaskCompletionSource<string>> _callbackMapper = new();
-    private const string _replyQueueName = QueueConfiguration.ContactCreatedQueueReturn;
+    private const string ReplyQueueName = QueueConfiguration.ContactCreatedQueueReturn;
     
     public CreateContactController()
     {
-        connectionFactory = new ConnectionFactory  {
+        IConnectionFactory connectionFactory = new ConnectionFactory  {
             Uri = new Uri(@"amqp://guest:guest@127.0.0.1:5672/"),
             NetworkRecoveryInterval = TimeSpan.FromSeconds(10),
             AutomaticRecoveryEnabled = true
@@ -39,7 +38,7 @@ public class CreateContactController : ControllerBase {
             throw new InvalidOperationException();
         }
         
-        await _channel.QueueDeclareAsync(queue: _replyQueueName, durable: false, exclusive: true, autoDelete: true, arguments: null);
+        await _channel.QueueDeclareAsync(queue: ReplyQueueName, durable: false, exclusive: true, autoDelete: true, arguments: null);
 
         var consumer = new AsyncEventingBasicConsumer(_channel);
         
@@ -59,7 +58,7 @@ public class CreateContactController : ControllerBase {
             return Task.CompletedTask;
         };
 
-        await _channel.BasicConsumeAsync(_replyQueueName, true, consumer);
+        await _channel.BasicConsumeAsync(ReplyQueueName, true, consumer);
     }
 
 
@@ -67,7 +66,8 @@ public class CreateContactController : ControllerBase {
     /// Cria um novo contato.
     /// </summary>
     /// <param name="contactRequest">O objeto de solicitação de criação do contato.</param>
-    /// <response code="200">Retorna o novo contato criado.</response>
+    /// <param name="cancellationToken">Token de cancelamento</param>
+    /// <response code="201">Retorna o novo contato criado.</response>
     /// <response code="400">Solicitação inválida.</response>
     /// <response code="500">Houve um erro interno no servidor.</response>
     /// <returns>Uma resposta de contato recém-criada.</returns>
@@ -97,7 +97,7 @@ public class CreateContactController : ControllerBase {
                 ContentEncoding = "utf-8",
                 DeliveryMode = DeliveryModes.Persistent,
                 CorrelationId = correlationId,
-                ReplyTo = _replyQueueName
+                ReplyTo = ReplyQueueName
             };
             
             var tcs = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -120,15 +120,32 @@ public class CreateContactController : ControllerBase {
                 tcs.SetCanceled(cancellationToken);
             });
 
-            var result = tcs.Task.Result;
+            try
+            {
+                var response = JsonSerializer.Deserialize<ContactResponse<Domain.Entities.Contact>>(tcs.Task.Result);
+                await DisposeAsync();
+
+                if (response == null)
+                {
+                    return Problem(null, null, 500, "Erro interno do servidor - Response nulo"); 
+                }
+                
+                return response.IsSuccess ? Created(response.Data?.Id.ToString(), response) : Problem(null, null, 500, response.Message); 
+            }
+            catch (ArgumentNullException e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro interno do servidor - ArgumentNullException" + e.Message);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro interno do servidor - Exception" + e.Message);
+            }
             
-            var response = JsonSerializer.Deserialize<ContactResponse<Domain.Entities.Contact>>(result);
             
-            return response.IsSuccess ? Ok(response) : Problem(null, null, 500, response.Message);
         }
         catch (BrokerUnreachableException e)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, "Erro interno do servidor - BrokerUnreachableException");
+            return StatusCode(StatusCodes.Status500InternalServerError, "Erro interno do servidor - BrokerUnreachableException" + e.Message);
         }
         catch (Exception e)
         {

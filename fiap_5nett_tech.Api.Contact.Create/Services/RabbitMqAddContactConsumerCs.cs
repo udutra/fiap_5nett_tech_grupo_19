@@ -1,6 +1,6 @@
 ﻿using fiap_5nett_tech.Application.Interface;
 
-namespace fiap_5nett_tech.Api.Contact.Create.Consumer.Services;
+namespace fiap_5nett_tech.Api.Contact.Create.Services;
 
 public class RabbitMqAddContactConsumerCs(IServiceScopeFactory scopeFactory) : IHostedService
 {
