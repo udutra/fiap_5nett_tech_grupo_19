@@ -10,25 +10,12 @@ services:
     networks:
       - mynw
 
-  fiap_5nett_tech:
-    image: ${DOCKER_REGISTRY-}fiap_5nett_tech.api
-    ports:
-      - 7015:7015
-    build:
-      context: .
-      dockerfile: fiap_5nett_tech.api/Dockerfile
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=7015
-    networks:
-      - mynw
-
   prometheus:
     image: prom/prometheus
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     networks:
@@ -41,47 +28,56 @@ services:
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
-      - ./grafana:/var/lib/grafana
+      - ./infra/grafana:/var/lib/grafana
     depends_on:
       - prometheus
     networks:
       - mynw
 
-networks:
-  mynw:
-
-  fiap_5nett_tech.contact:
-    image: fiap_5nett_tech.contact
+  rabbitmq:
+    container_name: RabbitMQ
+    hostname: rabbitmq
     build:
-      context: .
-      dockerfile: fiap_5nett_tech.Contact/Dockerfile
+      context: ./infra/rabbitmq
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq/mnesia
+    ports:
+      - "15672:15672" #management # habilitado visualização no browser
+      #- "15692:15692" #prometheus # desnecessário
+      - "5672:5672" #amqp       # desnecessário
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -I -s -L http://localhost:15672 || exit 1"
+        ]
+      interval: 30s
+      timeout: 20s
+      retries: 5
+    depends_on:
+      - grafana
+        
+    networks:
+      - mynw
 
   fiap_5nett_tech.api.contact.create:
     image: fiap_5nett_tech.api.contact.create
+    ports:
+      - "7175:7175"
     build:
       context: .
       dockerfile: fiap_5nett_tech.Api.Contact.Create/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=7175
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - mynw
 
-  fiap_5nett_tech.api.contact.create.consumer:
-    image: fiap_5nett_tech.api.contact.create.consumer
-    build:
-      context: .
-      dockerfile: fiap_5nett_tech.Api.Contact.Create.Consumer/Dockerfile
-
-  consoleapp1:
-    image: consoleapp1
-    build:
-      context: .
-      dockerfile: ConsoleApp1/Dockerfile
-
-  webapplication1:
-    image: webapplication1
-    build:
-      context: .
-      dockerfile: WebApplication1/Dockerfile
-
-  fiap_5nett_tech.api.contact.create.consumer:
-    image: fiap_5nett_tech.api.contact.create.consumer
-    build:
-      context: .
-      dockerfile: fiap_5nett_tech.Api.Contact.Create.Consumer/Dockerfile
+volumes:
+  rabbitmq_data:
+    
+networks:
+  mynw:

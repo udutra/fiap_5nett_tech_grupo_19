@@ -14,6 +14,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Itens de Solução", "Itens de Solução", "{88344486-6338-409D-9D7C-C3D16B2C6A48}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\ci.yml = .github\workflows\ci.yml
+		docker-compose.yml = docker-compose.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "fiap_5nett_tech.Api.Contact.Create", "fiap_5nett_tech.Api.Contact.Create\fiap_5nett_tech.Api.Contact.Create.csproj", "{0E8A96AC-2363-4716-8A6C-25C5B9F859A1}"

@@ -8,6 +8,6 @@ alerting:
 rule_files:
 
 scrape_configs:
-  - job_name: 'Api'
+  - job_name: 'Api.Contact.Create'
     static_configs:
-      - targets: ['fiap_5nett_tech_grupo_19-fiap_5nett_tech-1:7015']
+      - targets: ['fiap_5nett_tech.Api.Contact.Create-1:7175']
