@@ -27,11 +27,7 @@ public class WorkerGetOneById : IDisposable
     {
         var factory = new ConnectionFactory
         {
-            HostName = "localhost",
-            UserName = "guest",
-            Password = "guest",
-            VirtualHost = "/",
-            Port = 5672,
+            Uri = new Uri(@"amqp://guest:guest@rabbitmq:5672/"),
             NetworkRecoveryInterval = TimeSpan.FromSeconds(10),
             AutomaticRecoveryEnabled = true
         };

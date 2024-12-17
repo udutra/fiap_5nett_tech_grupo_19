@@ -48,8 +48,8 @@ app.Use((context, next) =>
 app.UseMetricServer();
 app.UseHttpMetrics();
 
-app.UseHttpsRedirection();
-app.UseStaticFiles();
+//app.UseHttpsRedirection();
+//app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
 

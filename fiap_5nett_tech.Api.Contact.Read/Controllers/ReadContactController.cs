@@ -32,7 +32,7 @@ public class ReadContactController : ControllerBase
     {
         var connectionFactory = new ConnectionFactory
         {
-            Uri = new Uri(@"amqp://guest:guest@localhost:5672/"),
+            Uri = new Uri(@"amqp://guest:guest@rabbitmq:5672/"),
             NetworkRecoveryInterval = TimeSpan.FromSeconds(10),
             AutomaticRecoveryEnabled = true
         };

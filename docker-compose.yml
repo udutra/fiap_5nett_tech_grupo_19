@@ -43,8 +43,9 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq/mnesia
     ports:
       - "15672:15672" #management # habilitado visualização no browser
-      #- "15692:15692" #prometheus # desnecessário
+      - "15692:15692" #prometheus # desnecessário
       - "5672:5672" #amqp       # desnecessário
+      - "5552:5552" 
     healthcheck:
       test:
         [
@@ -63,13 +64,29 @@ services:
   fiap_5nett_tech.api.contact.create:
     image: fiap_5nett_tech.api.contact.create
     ports:
-      - "7175:7175"
+      - "5151:5151"
     build:
       context: .
       dockerfile: fiap_5nett_tech.Api.Contact.Create/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=7175
+      - ASPNETCORE_HTTP_PORTS=5151
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - mynw
+  
+  fiap_5nett_tech.api.contact.read:
+    image: fiap_5nett_tech.api.contact.read
+    ports:
+      - "5166:5166"
+    build:
+      context: .
+      dockerfile: fiap_5nett_tech.Api.Contact.Read/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=5166
     depends_on:
       rabbitmq:
         condition: service_healthy
