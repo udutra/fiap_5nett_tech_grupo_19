@@ -61,7 +61,6 @@ app.Use((context, next) =>
     return next();
 });
 
-
 app.UseMetricServer();
 app.UseHttpMetrics();
 app.MapPrometheusScrapingEndpoint();
