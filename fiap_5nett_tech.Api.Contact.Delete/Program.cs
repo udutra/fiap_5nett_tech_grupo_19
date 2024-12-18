@@ -49,6 +49,20 @@ builder.Services.AddHostedService<RabbitMqDeleteContactConsumerCs>();
 
 var app = builder.Build();
 
+
+//Prometheus
+var counter = Metrics.CreateCounter("webapimetricDelete", "count requests to the Web Api Delete Endpoint",
+    new CounterConfiguration()
+    {
+        LabelNames = ["method", "endpoint"]
+    });
+
+app.Use((context, next) =>
+{
+    counter.WithLabels(context.Request.Method, context.Request.Path).Inc();
+    return next();
+});
+
 app.UseMetricServer();
 app.UseHttpMetrics();
 app.MapPrometheusScrapingEndpoint();

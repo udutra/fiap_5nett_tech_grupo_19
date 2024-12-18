@@ -49,6 +49,19 @@ builder.Services.AddHostedService<RabbitMqUpdateContactConsumerCs>();
 
 var app = builder.Build();
 
+var counter = Metrics.CreateCounter("webapimetricUpdate", "count requests to the Web Api Update Endpoint",
+    new CounterConfiguration()
+    {
+        LabelNames = ["method", "endpoint"]
+    });
+
+app.Use((context, next) =>
+{
+    counter.WithLabels(context.Request.Method, context.Request.Path).Inc();
+    return next();
+});
+
+
 app.UseMetricServer();
 app.UseHttpMetrics();
 app.MapPrometheusScrapingEndpoint();
