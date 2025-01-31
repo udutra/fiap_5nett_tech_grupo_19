@@ -1,21 +1,56 @@
 # This is a generated file. Not intended for manual editing.
-version: "3.4"
 services:
-  my-api:
+  fiap_5nett_tech.api.contact.read:
     build:
-      context: "C:\\Users\\Guilherme\\Documents\\Github\\Fiap\\fiap_5nett_tech_grupo_19\\\
-        fiap_5nett_tech.api"
-      dockerfile: "Dockerfile"
+      context: "D:\\GitHub\\fiap_5nett_tech_grupo_19"
+      dockerfile: "fiap_5nett_tech.Api.Contact.Read/Dockerfile"
+      target: "base"
     command: []
     entrypoint:
     - "dotnet"
-    - "/app/bin/Debug/net8.0/fiap_5nett_tech.api.dll"
+    - "/app/bin/Debug/net8.0/fiap_5nett_tech.Api.Contact.Read.dll"
     environment:
       DOTNET_USE_POLLING_FILE_WATCHER: "true"
-    image: "fiap_5nett_tech.api:dev"
+    image: "fiap_5nett_tech.api.contact.read:dev"
     ports: []
     volumes:
-    - "C:\\Users\\Guilherme\\.nuget\\packages:/root/.nuget/packages"
-    - "C:\\Users\\Guilherme\\Documents\\Github\\Fiap\\fiap_5nett_tech_grupo_19\\fiap_5nett_tech.api:/app:rw"
-    - "C:\\Users\\Guilherme\\Documents\\Github\\Fiap\\fiap_5nett_tech_grupo_19:/src:rw"
+    - "D:\\GitHub\\fiap_5nett_tech_grupo_19\\fiap_5nett_tech.Api.Contact.Read:/app:rw"
+    - "D:\\GitHub\\fiap_5nett_tech_grupo_19:/src:rw"
+    - "C:\\Users\\Guilherme\\.nuget\\packages:/home/app/.nuget/packages"
+    working_dir: "/app"
+  fiap_5nett_tech.api.contact.update:
+    build:
+      context: "D:\\GitHub\\fiap_5nett_tech_grupo_19"
+      dockerfile: "fiap_5nett_tech.Api.Contact.Update/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net8.0/fiap_5nett_tech.Api.Contact.Update.dll"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "fiap_5nett_tech.api.contact.update:dev"
+    ports: []
+    volumes:
+    - "D:\\GitHub\\fiap_5nett_tech_grupo_19\\fiap_5nett_tech.Api.Contact.Update:/app:rw"
+    - "D:\\GitHub\\fiap_5nett_tech_grupo_19:/src:rw"
+    - "C:\\Users\\Guilherme\\.nuget\\packages:/home/app/.nuget/packages"
+    working_dir: "/app"
+  iap_5nett_tech.api.contact.delete:
+    build:
+      context: "D:\\GitHub\\fiap_5nett_tech_grupo_19"
+      dockerfile: "fiap_5nett_tech.Api.Contact.Delete/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net8.0/fiap_5nett_tech.Api.Contact.Delete.dll"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "fiap_5nett_tech.api.contact.delete:dev"
+    ports: []
+    volumes:
+    - "D:\\GitHub\\fiap_5nett_tech_grupo_19\\fiap_5nett_tech.Api.Contact.Delete:/app:rw"
+    - "D:\\GitHub\\fiap_5nett_tech_grupo_19:/src:rw"
+    - "C:\\Users\\Guilherme\\.nuget\\packages:/home/app/.nuget/packages"
     working_dir: "/app"

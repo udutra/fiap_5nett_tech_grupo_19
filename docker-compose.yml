@@ -62,12 +62,13 @@ services:
       - mynw
 
   fiap_5nett_tech.api.contact.create:
-    image: fiap_5nett_tech.api.contact.create
+    image: fiap_5nett_tech.api.createcontact
     ports:
       - "5151:5151"
     build:
-      context: .
-      dockerfile: fiap_5nett_tech.Api.Contact.Create/Dockerfile
+      context: ./fiap_5nett_tech.Api/fiap_5nett_tech.Api.CreateContact
+      dockerfile: Dockerfile
+  
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=5151
@@ -77,51 +78,7 @@ services:
     networks:
       - mynw
   
-  fiap_5nett_tech.api.contact.read:
-    image: fiap_5nett_tech.api.contact.read
-    ports:
-      - "5166:5166"
-    build:
-      context: .
-      dockerfile: fiap_5nett_tech.Api.Contact.Read/Dockerfile
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=5166
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-    networks:
-      - mynw
-  fiap_5nett_tech.api.contact.update:
-    image: fiap_5nett_tech.api.contact.update
-    ports:
-      - "5092:5092"
-    build:
-      context: .
-      dockerfile: fiap_5nett_tech.Api.Contact.Update/Dockerfile
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=5092
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-    networks:
-      - mynw
-  iap_5nett_tech.api.contact.delete:
-    image: fiap_5nett_tech.api.contact.delete
-    ports:
-      - "5149:5149"
-    build:
-      context: .
-      dockerfile: fiap_5nett_tech.Api.Contact.Delete/Dockerfile
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=5149
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-    networks:
-      - mynw
+  
 
 volumes:
   rabbitmq_data:
