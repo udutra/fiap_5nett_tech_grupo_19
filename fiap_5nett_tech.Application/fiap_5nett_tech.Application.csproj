@@ -6,13 +6,12 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
     
+    
     <ItemGroup>
       <ProjectReference Include="..\fiap_5nett_tech.Domain\fiap_5nett_tech.Domain.csproj" />
       <ProjectReference Include="..\fiap_5nett_tech.Infrastructure\fiap_5nett_tech.Infrastructure.csproj" />		
     </ItemGroup>
     
-    <ItemGroup>
-      <PackageReference Include="RabbitMQ.Client" Version="7.0.0" />
-    </ItemGroup>
+    
 
 </Project>

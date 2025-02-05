@@ -1,5 +1,5 @@
 using System.Reflection;
-using fiap_5nett_tech.Api.CreateContact.Services;
+using fiap_5nett_tech.Api.ReadContact.Services;
 using fiap_5nett_tech.Application.Interface;
 using fiap_5nett_tech.Application.Service;
 using fiap_5nett_tech.Domain.Repositories;
@@ -33,23 +33,27 @@ builder.Services.AddOpenTelemetry()
         b.AddMeter("Microsoft.AspNetCore.Server.Kestrel");
     });
 
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => {
-        c.SwaggerDoc("v1", new OpenApiInfo { Title = "Tech Challenge 1", Version = "" });
-        var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-        c.IncludeXmlComments(xmlPath);
-    });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Tech Challenge 1", Version = "" });
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
+});
 
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();
 builder.Services.AddScoped<IContactInterface, ContactService>();
-builder.Services.AddHostedService<RabbitMqAddContactConsumerCs>();
+builder.Services.AddHostedService<RabbitMqReadContactGetOneByIdConsumerCs>();
+builder.Services.AddHostedService<RabbitMqReadContactGetOneByDddAndPhoneConsumerCs>();
+builder.Services.AddHostedService<RabbitMqReadContactGetAllConsumerCs>();
+
 var app = builder.Build();
 
 //Prometheus
-var counter = Metrics.CreateCounter("webapimetricCreate", "count requests to the Web Api Create Endpoint",
+var counter = Metrics.CreateCounter("webapimetricRead", "count requests to the Web Api Read Endpoint",
     new CounterConfiguration()
     {
         LabelNames = ["method", "endpoint"]
@@ -79,5 +83,7 @@ if (app.Environment.IsDevelopment())
 
 app.Run();
 
-
+/// <summary>
+/// 
+/// </summary>
 public partial class Program { }

@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Text;
 using System.Text.Json;
 using fiap_5nett_tech.Application.DataTransfer.Request;
@@ -9,39 +9,42 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 
-namespace fiap_5nett_tech.Api.CreateContact.Controllers;
+namespace fiap_5nett_tech.Api.UpdateContact.Controllers;
 
 [ApiController]
 [Route("api/[controller]/")]
-public class CreateContactController : ControllerBase {
-    
+public class UpdateContactController : ControllerBase
+{
+
     private readonly IConnection? _connection;
     private readonly IChannel? _channel;
     private readonly ConcurrentDictionary<string, TaskCompletionSource<string>> _callbackMapper = new();
-    private const string ReplyQueueName = QueueConfiguration.ContactCreatedQueueReturn;
-    
-    public CreateContactController()
+    private const string ReplyQueueName = QueueConfiguration.ContactUpdatedQueueReturn;
+
+    public UpdateContactController()
     {
-        var connectionFactory = new ConnectionFactory  {
+        var connectionFactory = new ConnectionFactory
+        {
             Uri = new Uri(@"amqp://guest:guest@rabbitmq:5672/"),
             NetworkRecoveryInterval = TimeSpan.FromSeconds(10),
             AutomaticRecoveryEnabled = true
         };
-        
+
         _connection = connectionFactory.CreateConnectionAsync().Result;
         _channel = _connection.CreateChannelAsync().Result;
     }
-    
+
     private async Task StartConsumerAsync()
     {
-        if (_channel is null){
+        if (_channel is null)
+        {
             throw new InvalidOperationException();
         }
-        
+
         await _channel.QueueDeclareAsync(queue: ReplyQueueName, durable: false, exclusive: false, autoDelete: true, arguments: null);
 
         var consumer = new AsyncEventingBasicConsumer(_channel);
-        
+
         consumer.ReceivedAsync += (model, ea) =>
         {
             var correlationId = ea.BasicProperties.CorrelationId;
@@ -67,29 +70,33 @@ public class CreateContactController : ControllerBase {
     /// </summary>
     /// <param name="contactRequest">O objeto de solicitação de criação do contato.</param>
     /// <param name="cancellationToken">Token de cancelamento</param>
-    /// <response code="201">Retorna o novo contato criado.</response>
+    /// <response code="200">Retorna o novo contato criado.</response>
     /// <response code="400">Solicitação inválida.</response>
     /// <response code="500">Houve um erro interno no servidor.</response>
     /// <returns>Uma resposta de contato recém-criada.</returns>
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] ContactRequest contactRequest, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Update([FromBody] ContactRequest contactRequest, CancellationToken cancellationToken = default)
     {
-        
+
         if (!ModelState.IsValid)
         {
             return StatusCode(StatusCodes.Status400BadRequest, "Campo(s) inválido(s) - BadRequest");
         }
-        if (_channel is null){
+        if (_channel is null)
+        {
             throw new InvalidOperationException();
         }
-        
+
         await StartConsumerAsync();
         try
         {
-            await _channel.ExchangeDeclareAsync(exchange: ExchangeConfiguration.Name, type: "direct", durable: true, autoDelete: false, arguments: null, cancellationToken: cancellationToken);
-            await _channel.QueueDeclareAsync(queue: QueueConfiguration.ContactCreatedQueue, durable: false, exclusive: false, autoDelete: false, arguments: null, cancellationToken: cancellationToken);
-            await _channel.QueueBindAsync(queue: QueueConfiguration.ContactCreatedQueue, exchange: ExchangeConfiguration.Name, routingKey: RoutingKeyConfiguration.RoutingQueueCreate, arguments: null, cancellationToken: cancellationToken);
-            
+            await _channel.ExchangeDeclareAsync(exchange: ExchangeConfiguration.Name, type: "direct", durable: true, autoDelete: false, arguments: null, 
+                cancellationToken: cancellationToken);
+            await _channel.QueueDeclareAsync(queue: QueueConfiguration.ContactUpdatedQueue, durable: false, exclusive: false, autoDelete: false, arguments: null, 
+                cancellationToken: cancellationToken);
+            await _channel.QueueBindAsync(queue: QueueConfiguration.ContactUpdatedQueue, exchange: ExchangeConfiguration.Name, 
+                routingKey: RoutingKeyConfiguration.RoutingQueueUpdate, arguments: null, cancellationToken: cancellationToken);
+
             var correlationId = Guid.NewGuid().ToString();
             var props = new BasicProperties
             {
@@ -99,19 +106,19 @@ public class CreateContactController : ControllerBase {
                 CorrelationId = correlationId,
                 ReplyTo = ReplyQueueName
             };
-            
+
             var tcs = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
             _callbackMapper.TryAdd(correlationId, tcs);
-            
+
             var message = JsonSerializer.Serialize(contactRequest);
             var body = Encoding.UTF8.GetBytes(message);
 
             await _channel.BasicPublishAsync(
                 exchange: ExchangeConfiguration.Name,
-                routingKey: RoutingKeyConfiguration.RoutingQueueCreate,
+                routingKey: RoutingKeyConfiguration.RoutingQueueUpdate,
                 mandatory: true,
                 basicProperties: props,
-                body, 
+                body,
                 cancellationToken: cancellationToken);
 
             //retorno da mensagem
@@ -124,13 +131,11 @@ public class CreateContactController : ControllerBase {
             {
                 var response = JsonSerializer.Deserialize<ContactResponse<Domain.Entities.Contact>>(tcs.Task.Result);
                 await DisposeAsync();
-
                 if (response == null)
                 {
                     return Problem(null, null, 500, "Erro interno do servidor - Response nulo"); 
                 }
-                
-                return response.IsSuccess ? Created(response.Data?.Id.ToString(), response) : Problem(null, null, 500, response.Message); 
+                return response.IsSuccess ? Ok(response) : Problem(null, null, 500, response.Message);
             }
             catch (ArgumentNullException e)
             {

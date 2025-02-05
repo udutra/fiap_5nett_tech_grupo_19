@@ -1,8 +1,8 @@
-using fiap_5nett_tech.Application.Interface;
+﻿using fiap_5nett_tech.Application.Interface;
 
-namespace fiap_5nett_tech.Api.CreateContact.Services;
+namespace fiap_5nett_tech.Api.UpdateContact.Services;
 
-public class RabbitMqAddContactConsumerCs(IServiceScopeFactory scopeFactory) : IHostedService
+public class RabbitMqUpdateContactConsumerCs(IServiceScopeFactory scopeFactory) : IHostedService
 {
     private Worker _consumer;
     private IServiceScope _scope;
@@ -11,7 +11,6 @@ public class RabbitMqAddContactConsumerCs(IServiceScopeFactory scopeFactory) : I
     {
         _scope = scopeFactory.CreateScope();
         var contactService = _scope.ServiceProvider.GetRequiredService<IContactInterface>();
-        //var regionRepository = _scope.ServiceProvider.GetRequiredService<IRegionRepository>();
         var serviceScopeFactory = _scope.ServiceProvider.GetService<IServiceScopeFactory>();
 
         _consumer = new Worker(contactService, serviceScopeFactory);

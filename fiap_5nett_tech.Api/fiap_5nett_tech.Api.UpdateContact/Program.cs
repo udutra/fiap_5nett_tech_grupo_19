@@ -1,5 +1,5 @@
 using System.Reflection;
-using fiap_5nett_tech.Api.CreateContact.Services;
+using fiap_5nett_tech.Api.UpdateContact.Services;
 using fiap_5nett_tech.Application.Interface;
 using fiap_5nett_tech.Application.Service;
 using fiap_5nett_tech.Domain.Repositories;
@@ -45,11 +45,11 @@ builder.Services.AddSwaggerGen(c => {
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();
 builder.Services.AddScoped<IContactInterface, ContactService>();
-builder.Services.AddHostedService<RabbitMqAddContactConsumerCs>();
+builder.Services.AddHostedService<RabbitMqUpdateContactConsumerCs>();
+
 var app = builder.Build();
 
-//Prometheus
-var counter = Metrics.CreateCounter("webapimetricCreate", "count requests to the Web Api Create Endpoint",
+var counter = Metrics.CreateCounter("webapimetricUpdate", "count requests to the Web Api Update Endpoint",
     new CounterConfiguration()
     {
         LabelNames = ["method", "endpoint"]
@@ -78,6 +78,5 @@ if (app.Environment.IsDevelopment())
 }
 
 app.Run();
-
 
 public partial class Program { }

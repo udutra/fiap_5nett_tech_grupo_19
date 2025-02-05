@@ -2,6 +2,7 @@
 using fiap_5nett_tech.Infrastructure.Data.Mappings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Configuration;
 
 namespace fiap_5nett_tech.Infrastructure.Data;
 
