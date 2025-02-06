@@ -9,6 +9,8 @@ services:
       - "1433:1433"
     networks:
       - mynw
+    volumes:
+      - sqlserverdata:/var/opt/mssql
 
   prometheus:
     image: prom/prometheus
@@ -57,14 +59,13 @@ services:
       retries: 5
     depends_on:
       - grafana
-        
     networks:
       - mynw
 
   fiap_5nett_tech.api.contact.create:
     image: fiap_5nett_tech.api.createcontact
     ports:
-      - "5151:80"
+      - "5151:5151"
     build:
       context: .
       dockerfile: fiap_5nett_tech.Api/fiap_5nett_tech.Api.CreateContact/Dockerfile
@@ -78,7 +79,56 @@ services:
     networks:
       - mynw
   
+  fiap_5nett_tech.api.contact.read:
+    image: fiap_5nett_tech.api.readcontact
+    ports:
+      - "5166:5166"
+    build:
+      context: .
+      dockerfile: fiap_5nett_tech.Api/fiap_5nett_tech.Api.ReadContact/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=5166
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - mynw
+  
+  fiap_5nett_tech.api.contact.update:
+    image: fiap_5nett_tech.api.updatecontact
+    ports:
+      - "5092:5092"
+    build:
+      context: .
+      dockerfile: /fiap_5nett_tech.Api/fiap_5nett_tech.Api.UpdateContact/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=5092
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - mynw
+  
+  fiap_5nett_tech.api.contact.delete:
+    image: fiap_5nett_tech.api.deletecontact
+    ports:
+      - "5149:5149"
+    build:
+      context: .
+      dockerfile: /fiap_5nett_tech.Api/fiap_5nett_tech.Api.DeleteContact/Dockerfile
+
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=5149
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - mynw
 volumes:
+  sqlserverdata:
   rabbitmq_data:
     
 networks:

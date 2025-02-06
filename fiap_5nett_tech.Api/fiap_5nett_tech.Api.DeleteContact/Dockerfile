@@ -5,10 +5,10 @@ EXPOSE 5149
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["fiap_5nett_tech.Api.DeleteContact.csproj", "./"]
-RUN dotnet restore "fiap_5nett_tech.Api.DeleteContact.csproj"
+COPY ./fiap_5nett_tech.Api/fiap_5nett_tech.Api.DeleteContact/fiap_5nett_tech.Api.DeleteContact.csproj ./fiap_5nett_tech.Api.DeleteContact/
+RUN dotnet restore "fiap_5nett_tech.Api.DeleteContact/fiap_5nett_tech.Api.DeleteContact.csproj"
 COPY . .
-WORKDIR "/src/"
+WORKDIR /src/fiap_5nett_tech.Api/fiap_5nett_tech.Api.DeleteContact
 RUN dotnet build "fiap_5nett_tech.Api.DeleteContact.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish

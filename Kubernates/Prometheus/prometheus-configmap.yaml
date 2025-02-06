@@ -1,0 +1,37 @@
+﻿apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 10s
+      evaluation_interval: 15s
+      
+    alerting:
+      alertmanagers:
+        - static_configs:
+            - targets:
+    rule_files:
+
+    scrape_configs:
+      - job_name: "prometheus"
+
+        static_configs:
+          - targets: ["localhost:9090"]
+
+      - job_name: "CreateContact"
+        static_configs:
+          - targets: ["createcontact-service"]
+      
+      - job_name: "DeleteContact"
+        static_configs:
+          - targets: ["deletecontact-service"]
+            
+      - job_name: "UpdateContact"
+        static_configs:
+          - targets: [ "updatecontact-service" ]
+            
+      - job_name: "ReadContact"
+        static_configs:
+          - targets: [ "readcontact-service" ]

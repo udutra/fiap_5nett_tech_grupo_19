@@ -5,10 +5,10 @@ EXPOSE 5166
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["fiap_5nett_tech.Api.ReadContact.csproj", "./"]
-RUN dotnet restore "fiap_5nett_tech.Api.ReadContact.csproj"
+COPY ./fiap_5nett_tech.Api/fiap_5nett_tech.Api.ReadContact/fiap_5nett_tech.Api.ReadContact.csproj ./fiap_5nett_tech.Api.ReadContact/
+RUN dotnet restore "fiap_5nett_tech.Api.ReadContact/fiap_5nett_tech.Api.ReadContact.csproj"
 COPY . .
-WORKDIR "/src/"
+WORKDIR /src/fiap_5nett_tech.Api/fiap_5nett_tech.Api.ReadContact
 RUN dotnet build "fiap_5nett_tech.Api.ReadContact.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish

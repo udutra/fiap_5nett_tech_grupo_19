@@ -1,0 +1,14 @@
+﻿apiVersion: v1
+kind: Service
+metadata:
+  name: sqlserver-service
+  labels:
+    app: sqlserver
+spec:
+  type: NodePort
+  selector:
+    app: sqlserver
+  ports:
+    - port: 1433 
+      targetPort: 1433
+      nodePort: 30008

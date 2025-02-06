@@ -1,0 +1,21 @@
+﻿apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-service
+  labels:
+    app: rabbitmq
+spec:
+  type: NodePort
+  selector:
+    app: rabbitmq
+  ports:
+    - port: 5672
+      targetPort: 5672
+      name: amqp
+    - port: 15672
+      targetPort: 15672
+      nodePort: 30007
+      name: management
+    - port: 15692
+      targetPort: 15692
+      name: masstransit

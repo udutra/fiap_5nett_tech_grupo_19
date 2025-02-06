@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: readcontact-deployment
+  labels:
+    app: fiap_5nett_tech.api.contact.read
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fiap_5nett_tech.api.contact.read
+  template:
+    metadata:
+      labels:
+        app: fiap_5nett_tech.api.contact.read
+    spec:
+      containers:
+        - name: fiap_5nett_tech.api.contact.read
+          image: fiap_5nett_tech.api.readcontact:latest
+          ports:
+            - containerPort: 8080
