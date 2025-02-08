@@ -62,14 +62,13 @@ services:
     networks:
       - mynw
 
-  fiap_5nett_tech.api.contact.create:
+  contact-create:
     image: fiap_5nett_tech.api.createcontact
     ports:
       - "5151:5151"
     build:
       context: .
-      dockerfile: fiap_5nett_tech.Api/fiap_5nett_tech.Api.CreateContact/Dockerfile
-  
+      dockerfile: DockerfileCC
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=5151
@@ -79,7 +78,7 @@ services:
     networks:
       - mynw
   
-  fiap_5nett_tech.api.contact.read:
+  contact-read:
     image: fiap_5nett_tech.api.readcontact
     ports:
       - "5166:5166"
@@ -95,7 +94,7 @@ services:
     networks:
       - mynw
   
-  fiap_5nett_tech.api.contact.update:
+  contact-update:
     image: fiap_5nett_tech.api.updatecontact
     ports:
       - "5092:5092"
@@ -111,7 +110,7 @@ services:
     networks:
       - mynw
   
-  fiap_5nett_tech.api.contact.delete:
+  contact-delete:
     image: fiap_5nett_tech.api.deletecontact
     ports:
       - "5149:5149"
@@ -133,3 +132,8 @@ volumes:
     
 networks:
   mynw:
+  fiap_5nett_tech.api.createcontact:
+    image: fiap_5nett_tech.api.createcontact
+    build:
+      context: .
+      dockerfile: fiap_5nett_tech.Api/fiap_5nett_tech.Api.CreateContact/Dockerfile

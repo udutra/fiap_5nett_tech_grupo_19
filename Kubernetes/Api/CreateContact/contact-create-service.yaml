@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: createcontact-service
+spec:
+  type: NodePort
+  selector:
+    app: contact-create
+  ports:
+    - port: 80
+      targetPort: 5151
+      nodePort: 30001

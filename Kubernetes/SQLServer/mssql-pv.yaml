@@ -1,0 +1,12 @@
+﻿apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mssql-pv
+spec:
+  capacity:
+    storage: 10Gi   # Defina o tamanho do volume
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:            # Isso é para ambientes locais como o Minikube. Em produção, use NFS, EBS, etc.
+    path: "/mnt/data/mssql"   # O caminho no nó onde os dados serão armazenados

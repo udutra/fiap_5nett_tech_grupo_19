@@ -1,7 +1,7 @@
 ﻿apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sqlserver-deployment
+  name: sqlserver
   labels:
     app: sqlserver
 spec:
@@ -24,12 +24,10 @@ spec:
               value: "Y"
             - name: SA_PASSWORD
               value: "1q2w3e4r@#$"
-            - name: MSSQL_PID
-              value: "Developer"
           volumeMounts:
-            - name: mssql-data
-              mountPath: /var/opt/mssql
+            - name: mssql-storage
+              mountPath: /var/opt/mssql   # Caminho onde o SQL Server armazena os dados
       volumes:
-        - name: mssql-data
+        - name: mssql-storage
           persistentVolumeClaim:
-            claimName: mssql-pvc
+            claimName: mssql-pvc   # Nome do PVC que você criou

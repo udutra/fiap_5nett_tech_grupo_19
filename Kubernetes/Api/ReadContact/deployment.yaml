@@ -3,19 +3,19 @@ kind: Deployment
 metadata:
   name: readcontact-deployment
   labels:
-    app: fiap_5nett_tech.api.contact.update
+    app: contact-read
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: fiap_5nett_tech.api.contact.update
+      app: contact-read
   template:
     metadata:
       labels:
-        app: fiap_5nett_tech.api.contact.update
+        app: contact-read
     spec:
       containers:
-        - name: fiap_5nett_tech.api.contact.update
-          image: fiap_5nett_tech.api.updatecontact:latest
+        - name: contact-read
+          image: fiap_5nett_tech.api.readcontact:latest
           ports:
             - containerPort: 8080

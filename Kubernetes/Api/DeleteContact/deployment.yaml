@@ -3,19 +3,19 @@ kind: Deployment
 metadata:
   name: deletecontact-deployment
   labels:
-    app: fiap_5nett_tech.api.contact.delete
+    app: contact-delete
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: fiap_5nett_tech.api.contact.delete
+      app: contact-delete
   template:
     metadata:
       labels:
-        app: fiap_5nett_tech.api.contact.delete
+        app: contact-delete
     spec:
       containers:
-        - name: fiap_5nett_tech.api.contact.delete
+        - name: contact-delete
           image: fiap_5nett_tech.api.deletecontact:latest
           ports:
             - containerPort: 8080

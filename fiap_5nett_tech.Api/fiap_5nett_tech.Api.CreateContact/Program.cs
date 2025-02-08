@@ -48,6 +48,17 @@ builder.Services.AddScoped<IContactInterface, ContactService>();
 builder.Services.AddHostedService<RabbitMqAddContactConsumerCs>();
 var app = builder.Build();
 
+using var scope = app.Services.CreateScope();
+var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+try{
+    dbContext.Database.Migrate();// Aplica as Migrations
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Erro ao aplicar migrations: {ex.Message}");
+}
+
 //Prometheus
 var counter = Metrics.CreateCounter("webapimetricCreate", "count requests to the Web Api Create Endpoint",
     new CounterConfiguration()

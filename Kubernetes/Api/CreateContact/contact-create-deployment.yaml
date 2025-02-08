@@ -3,19 +3,20 @@ kind: Deployment
 metadata:
   name: createcontact-deployment
   labels:
-    app: fiap_5nett_tech.api.contact.create
+    app: contact-create
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: fiap_5nett_tech.api.contact.create
+      app: contact-create
   template:
     metadata:
       labels:
-        app: fiap_5nett_tech.api.contact.create
+        app: contact-create
     spec:
       containers:
-        - name: fiap_5nett_tech.api.contact.create
+        - name: contact-create
           image: fiap_5nett_tech.api.createcontact:latest
+          imagePullPolicy: Never
           ports:
-            - containerPort: 8080
+            - containerPort: 5151

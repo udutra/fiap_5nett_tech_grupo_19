@@ -1,0 +1,11 @@
+﻿apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mssql-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi  # O PVC vai solicitar um volume de 10 GB
+  storageClassName: standard # O StorageClass deve ser compatível com redimensionamento

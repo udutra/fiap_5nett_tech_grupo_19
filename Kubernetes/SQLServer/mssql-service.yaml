@@ -9,6 +9,5 @@ spec:
   selector:
     app: sqlserver
   ports:
-    - port: 1433 
-      targetPort: 1433
+    - port: 1433
       nodePort: 30008
