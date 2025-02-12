@@ -20,7 +20,12 @@ public class Worker : IDisposable
     {
         var factory = new ConnectionFactory
         {
-            Uri = new Uri("amqp://guest:guest@rabbitmq-service:5672/"),
+            //Uri = new Uri("amqp://guest:guest@127.0.0.1:5672/"),
+            UserName = "guest",
+            Password = "guest",
+            HostName = "rabbitmq-service",
+            VirtualHost = "/",
+            Port = 5672,
             NetworkRecoveryInterval = TimeSpan.FromSeconds(10),
             AutomaticRecoveryEnabled = true
         };

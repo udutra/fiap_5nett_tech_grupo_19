@@ -10,6 +10,7 @@ using Microsoft.OpenApi.Models;
 using OpenTelemetry.Metrics;
 using Prometheus;
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContextFactory<AppDbContext>(options =>
@@ -46,6 +47,22 @@ builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();
 builder.Services.AddScoped<IContactInterface, ContactService>();
 builder.Services.AddHostedService<RabbitMqAddContactConsumerCs>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(MyAllowSpecificOrigins,
+        policy =>
+        {
+            policy.WithOrigins("http://localhost.com",
+                    "http://170.0.0.1")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
+
+
+
 var app = builder.Build();
 
 using var scope = app.Services.CreateScope();
@@ -76,6 +93,7 @@ app.UseMetricServer();
 app.UseHttpMetrics();
 app.MapPrometheusScrapingEndpoint();
 app.UseRouting();
+app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthorization();
 
 app.MapControllers();

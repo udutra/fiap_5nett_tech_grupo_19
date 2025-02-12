@@ -5,17 +5,22 @@ metadata:
   labels:
     app: rabbitmq
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: rabbitmq
   ports:
     - port: 5672
+      protocol: TCP
       targetPort: 5672
+      nodePort: 30009
       name: amqp
     - port: 15672
+      protocol: TCP
       targetPort: 15672
       nodePort: 30007
       name: management
     - port: 15692
+      protocol: TCP
       targetPort: 15692
+      nodePort: 30010
       name: masstransit
