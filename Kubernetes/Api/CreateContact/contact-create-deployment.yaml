@@ -20,3 +20,6 @@ spec:
           imagePullPolicy: Never
           ports:
             - containerPort: 5151
+          env:
+            - name: ASPNETCORE_URLS
+              value: "http://+:5151"  # Configura para escutar na porta 5151

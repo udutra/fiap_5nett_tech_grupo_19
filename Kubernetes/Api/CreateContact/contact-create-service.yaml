@@ -7,6 +7,6 @@ spec:
   selector:
     app: contact-create
   ports:
-    - port: 5151
+    - port: 8080
       targetPort: 5151
       nodePort: 30001
