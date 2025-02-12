@@ -20,7 +20,7 @@ public class Worker : IDisposable
     {
         var factory = new ConnectionFactory
         {
-            Uri = new Uri("amqp://guest:guest@rabbitmq:5672/"),
+            Uri = new Uri("amqp://guest:guest@rabbitmq-service:5672/"),
             NetworkRecoveryInterval = TimeSpan.FromSeconds(10),
             AutomaticRecoveryEnabled = true
         };

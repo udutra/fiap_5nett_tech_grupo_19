@@ -7,6 +7,9 @@ services:
       MSSQL_PID: "Developer"
     ports:
       - "1433:1433"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     networks:
       - mynw
     volumes:
@@ -117,23 +120,19 @@ services:
     build:
       context: .
       dockerfile: /fiap_5nett_tech.Api/fiap_5nett_tech.Api.DeleteContact/Dockerfile
-
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=5149
     depends_on:
-      rabbitmq:
-        condition: service_healthy
+      - sqlserver
+        
     networks:
       - mynw
+
 volumes:
   sqlserverdata:
   rabbitmq_data:
     
 networks:
   mynw:
-  fiap_5nett_tech.api.createcontact:
-    image: fiap_5nett_tech.api.createcontact
-    build:
-      context: .
-      dockerfile: fiap_5nett_tech.Api/fiap_5nett_tech.Api.CreateContact/Dockerfile
+    driver: bridge

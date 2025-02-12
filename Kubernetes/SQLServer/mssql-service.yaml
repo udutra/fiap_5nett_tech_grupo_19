@@ -5,7 +5,7 @@ metadata:
   labels:
     app: sqlserver
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: sqlserver
   ports:
