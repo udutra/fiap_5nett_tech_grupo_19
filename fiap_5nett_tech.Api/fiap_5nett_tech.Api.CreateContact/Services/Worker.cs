@@ -25,7 +25,7 @@ public class Worker : IDisposable
             Password = "guest",
             HostName = "rabbitmq-service",
             VirtualHost = "/",
-            Port = 5672,
+            Port = 8081,
             NetworkRecoveryInterval = TimeSpan.FromSeconds(10),
             AutomaticRecoveryEnabled = true
         };

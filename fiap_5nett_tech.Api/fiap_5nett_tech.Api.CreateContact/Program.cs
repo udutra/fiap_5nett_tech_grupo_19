@@ -60,9 +60,6 @@ builder.Services.AddCors(options =>
         });
 });
 
-
-
-
 var app = builder.Build();
 
 using var scope = app.Services.CreateScope();
@@ -90,7 +87,12 @@ app.Use((context, next) =>
 });
 
 app.UseMetricServer();
-app.UseHttpMetrics();
+app.UseHttpMetrics(options =>
+{
+    options.AddRouteParameter("route"); // Adiciona o rótulo "route"
+});
+
+
 app.MapPrometheusScrapingEndpoint();
 app.UseRouting();
 app.UseCors(MyAllowSpecificOrigins);
@@ -100,13 +102,9 @@ app.MapControllers();
 
 app.MapGet("/", () => "Hello World!");
 
-//if (app.Environment.IsDevelopment())
-//{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-//}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.Run();
-
 
 public partial class Program { }
