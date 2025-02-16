@@ -20,7 +20,7 @@ public class ContactServiceTests
     }
 
     [Fact]
-    [Trait("Category", "UnitTest")]
+    [Trait("Category", "IntegrationTest")]
     public void Create_ShouldReturnContactResponse_WhenContactIsCreatedSuccessfully()
     {
         
@@ -48,7 +48,7 @@ public class ContactServiceTests
     }
 
     [Fact]
-    [Trait("Category", "UnitTest")]
+    [Trait("Category", "IntegrationTest")]
     public void Create_ShouldReturnBadRequest_WhenRegionNotFound()
     {
         
@@ -75,7 +75,7 @@ public class ContactServiceTests
     }
 
     [Fact]
-    [Trait("Category", "UnitTest")]
+    [Trait("Category", "IntegrationTest")]
     public void Create_ShouldReturnBadRequest_WhenPhoneNumberAlreadyExists()
     {
         
@@ -101,7 +101,7 @@ public class ContactServiceTests
     }
 
     [Fact]
-    [Trait("Category", "UnitTest")]
+    [Trait("Category", "IntegrationTest")]
     public void Create_ShouldReturnBadRequest_WhenPhoneNumberIsInvalid()
     {
         
@@ -126,7 +126,7 @@ public class ContactServiceTests
 
 
     [Fact]
-    [Trait("Category", "UnitTest")]
+    [Trait("Category", "IntegrationTest")]
     public void Update_ShouldReturnContactResponse_WhenContactIsUpdatedSuccessfully()
     {
         var existingContact = new Contact("John Doe", "john.doe@example.com", "123456789", new Region { Ddd = 11 });
@@ -152,7 +152,7 @@ public class ContactServiceTests
     }
 
     [Fact]
-    [Trait("Category", "UnitTest")]
+    [Trait("Category", "IntegrationTest")]
     public void Update_ShouldReturnNotFound_WhenContactDoesNotExist()
     {
         
@@ -176,7 +176,7 @@ public class ContactServiceTests
     }
 
     [Fact]
-    [Trait("Category", "UnitTest")]
+    [Trait("Category", "IntegrationTest")]
     public void Update_ShouldNotChangeFields_WhenRequestFieldsAreNullOrEmpty()
     {
         
@@ -202,7 +202,7 @@ public class ContactServiceTests
         _mockContactRepository.Verify(c => c.Update(existingContact), Times.Once);
     }
     [Fact]
-    [Trait("Category", "UnitTest")]
+    [Trait("Category", "IntegrationTest")]
     public void Delete_ShouldReturnContactResponse_WhenContactIsDeletedSuccessfully()
     {
         
@@ -220,7 +220,7 @@ public class ContactServiceTests
     }
 
     [Fact]
-    [Trait("Category", "UnitTest")]
+    [Trait("Category", "IntegrationTest")]
     public void Delete_ShouldReturnNotFound_WhenContactDoesNotExist()
     {
         
@@ -238,7 +238,7 @@ public class ContactServiceTests
     }
 
     [Fact]
-    [Trait("Category", "UnitTest")]
+    [Trait("Category", "IntegrationTest")]
     public void Delete_ShouldReturnInternalServerError_WhenExceptionIsThrown()
     {
         
@@ -256,7 +256,7 @@ public class ContactServiceTests
     }
 
     [Fact]
-    [Trait("Category", "UnitTest")]
+    [Trait("Category", "IntegrationTest")]
     public void GetOneById_ShouldReturnContactResponse_WhenContactIsFound()
     {
         var contactId = Guid.NewGuid();
@@ -274,7 +274,7 @@ public class ContactServiceTests
     }
 
     [Fact]
-    [Trait("Category", "UnitTest")]
+    [Trait("Category", "IntegrationTest")]
     public void GetOneById_ShouldReturnNotFound_WhenContactDoesNotExist()
     {
         
@@ -294,7 +294,7 @@ public class ContactServiceTests
     }
 
     [Fact]
-    [Trait("Category", "UnitTest")]
+    [Trait("Category", "IntegrationTest")]
     public void GetOneById_ShouldReturnInternalServerError_WhenExceptionIsThrown()
     {
         var contactId = Guid.NewGuid();
@@ -311,7 +311,7 @@ public class ContactServiceTests
     }
 
     [Fact]
-    [Trait("Category", "UnitTest")]
+    [Trait("Category", "IntegrationTest")]
     public void GetOneByDddAndPhoneNumber_ShouldReturnContactResponse_WhenContactIsFound()
     {
         var ddd = 11;
@@ -330,7 +330,7 @@ public class ContactServiceTests
     }
 
     [Fact]
-    [Trait("Category", "UnitTest")]
+    [Trait("Category", "IntegrationTest")]
     public void GetOneByDddAndPhoneNumber_ShouldReturnNotFound_WhenContactDoesNotExist()
     {
         var ddd = 11;
@@ -348,7 +348,7 @@ public class ContactServiceTests
     }
 
     [Fact]
-    [Trait("Category", "UnitTest")]
+    [Trait("Category", "IntegrationTest")]
     public void GetOneByDddAndPhoneNumber_ShouldReturnInternalServerError_WhenExceptionIsThrown()
     {
         var ddd = 11;
@@ -366,7 +366,7 @@ public class ContactServiceTests
     }
 
     [Fact]
-    [Trait("Category", "UnitTest")]
+    [Trait("Category", "IntegrationTest")]
     public void GetAll_ShouldReturnPagedContactResponse_WhenContactsAreFound()
     {
         
@@ -410,7 +410,7 @@ public class ContactServiceTests
     }
 
     [Fact]
-    [Trait("Category", "UnitTest")]
+    [Trait("Category", "IntegrationTest")]
     public void GetAll_ShouldReturnEmptyPagedContactResponse_WhenNoContactsAreFound()
     {
         var request = new GetAllContactRequest
@@ -445,7 +445,7 @@ public class ContactServiceTests
     }
     
     [Fact]
-    [Trait("Category", "UnitTest")]
+    [Trait("Category", "IntegrationTest")]
     public void GetAll_ShouldReturnInternalServerError_WhenExceptionIsThrown()
     {
         var request = new GetAllContactRequest
