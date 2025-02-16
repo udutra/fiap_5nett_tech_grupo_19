@@ -24,3 +24,23 @@ data:
         metrics_path: '/metrics'
         static_configs:
           - targets: ["createcontact-service.default.svc.cluster.local:8080"]
+            
+      - job_name: "ReadContact"
+        metrics_path: '/metrics'
+        static_configs:
+          - targets: ["readcontact-service.default.svc.cluster.local:8084"]
+      
+      - job_name: "UpdateContact"
+        metrics_path: '/metrics'
+        static_configs:
+          - targets: ["updatecontact-service.default.svc.cluster.local:8085"]
+
+      - job_name: "DeleteContact"
+        metrics_path: '/metrics'
+        static_configs:
+          - targets: ["deletecontact-service.default.svc.cluster.local:8086"]
+
+      - job_name: "Rabbitmq"
+        metrics_path: '/metrics'
+        static_configs:
+          - targets: ["rabbitmq-service.default.svc.cluster.local:8083"]

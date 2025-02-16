@@ -10,6 +10,7 @@ using Microsoft.OpenApi.Models;
 using OpenTelemetry.Metrics;
 using Prometheus;
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContextFactory<AppDbContext>(options =>
@@ -36,18 +37,41 @@ builder.Services.AddOpenTelemetry()
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Tech Challenge 1", Version = "" });
-    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    c.IncludeXmlComments(xmlPath);
-});
+        c.SwaggerDoc("v1", new OpenApiInfo { Title = "Tech Challenge 1", Version = "" });
+        var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+        c.IncludeXmlComments(xmlPath);
+    });
 
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();
 builder.Services.AddScoped<IContactInterface, ContactService>();
 builder.Services.AddHostedService<RabbitMqDeleteContactConsumerCs>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(MyAllowSpecificOrigins,
+        policy =>
+        {
+            policy.WithOrigins("http://localhost.com",
+                    "http://170.0.0.1")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
+
+using var scope = app.Services.CreateScope();
+var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+try{
+    dbContext.Database.Migrate();// Aplica as Migrations
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Erro ao aplicar migrations: {ex.Message}");
+}
 
 //Prometheus
 var counter = Metrics.CreateCounter("webapimetricDelete", "count requests to the Web Api Delete Endpoint",
@@ -63,20 +87,24 @@ app.Use((context, next) =>
 });
 
 app.UseMetricServer();
-app.UseHttpMetrics();
+app.UseHttpMetrics(options =>
+{
+    options.AddRouteParameter("route"); // Adiciona o rótulo "route"
+});
+
 app.MapPrometheusScrapingEndpoint();
 app.UseRouting();
+app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.MapGet("/", () => "Hello World!");
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
 
 app.Run();
 

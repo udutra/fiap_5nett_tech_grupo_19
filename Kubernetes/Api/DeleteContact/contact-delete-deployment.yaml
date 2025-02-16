@@ -5,7 +5,7 @@ metadata:
   labels:
     app: contact-delete
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: contact-delete
@@ -17,5 +17,9 @@ spec:
       containers:
         - name: contact-delete
           image: fiap_5nett_tech.api.deletecontact:latest
+          imagePullPolicy: Never
           ports:
-            - containerPort: 8080
+            - containerPort: 5149
+          env:
+            - name: ASPNETCORE_URLS
+              value: "http://+:5149"  # Configura para escutar na porta 5149

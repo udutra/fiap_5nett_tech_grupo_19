@@ -25,7 +25,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 3,
+  "id": 1,
   "links": [],
   "panels": [
     {
@@ -1294,15 +1294,15 @@
       {
         "allowCustomValue": true,
         "current": {
-          "text": "All",
-          "value": "$__all"
+          "text": "UpdateContact",
+          "value": "UpdateContact"
         },
         "datasource": {
           "type": "prometheus",
           "uid": "eed6p7966f400c"
         },
         "definition": "label_values(http_requests_received_total,job)",
-        "includeAll": true,
+        "includeAll": false,
         "label": "Job",
         "name": "job",
         "options": [],
@@ -1318,8 +1318,8 @@
       },
       {
         "current": {
-          "text": "createcontact-service.default.svc.cluster.local:8080",
-          "value": "createcontact-service.default.svc.cluster.local:8080"
+          "text": "updatecontact-service.default.svc.cluster.local:8085",
+          "value": "updatecontact-service.default.svc.cluster.local:8085"
         },
         "datasource": {
           "type": "prometheus",
@@ -1342,10 +1342,11 @@
       },
       {
         "current": {
-          "text": "/",
-          "value": "/"
+          "text": "api/UpdateContact",
+          "value": "api/UpdateContact"
         },
         "definition": "label_values(http_requests_received_total{job=\"$job\", instance=\"$instance\"},endpoint)",
+        "includeAll": false,
         "label": "endpoint",
         "name": "endpoint",
         "options": [],
@@ -1368,6 +1369,6 @@
   "timezone": "",
   "title": "ASP.NET Core",
   "uid": "KdDACDp4z",
-  "version": 4,
+  "version": 1,
   "weekStart": ""
 }

@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: readcontact-deployment
+  name: updatecontact-deployment
   labels:
     app: contact-update
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: contact-update
@@ -17,5 +17,9 @@ spec:
       containers:
         - name: contact-update
           image: fiap_5nett_tech.api.updatecontact:latest
+          imagePullPolicy: Never
           ports:
-            - containerPort: 8080
+            - containerPort: 5092
+          env:
+            - name: ASPNETCORE_URLS
+              value: "http://+:5092"  # Configura para escutar na porta 5092

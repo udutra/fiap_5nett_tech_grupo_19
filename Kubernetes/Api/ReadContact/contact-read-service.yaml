@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: readcontact-service
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: contact-read
   ports:
-    - port: 80
-      targetPort: 8080
+    - port: 8084
+      targetPort: 5166
       nodePort: 30003

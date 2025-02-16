@@ -27,9 +27,13 @@ public class ReadContactController : ControllerBase
     /// </summary>
     public ReadContactController()
     {
-        var connectionFactory = new ConnectionFactory
-        {
-            Uri = new Uri(@"amqp://guest:guest@rabbitmq:5672/"),
+        var connectionFactory = new ConnectionFactory  {
+            //Uri = new Uri("amqp://guest:guest@127.0.0.1:5672/"),
+            UserName = "guest",
+            Password = "guest",
+            HostName = "rabbitmq-service",
+            VirtualHost = "/",
+            Port = 8081,
             NetworkRecoveryInterval = TimeSpan.FromSeconds(10),
             AutomaticRecoveryEnabled = true
         };

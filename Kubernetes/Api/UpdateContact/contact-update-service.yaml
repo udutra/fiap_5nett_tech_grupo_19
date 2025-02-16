@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: updatecontact-service
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: contact-update
   ports:
-    - port: 80
-      targetPort: 8080
+    - port: 8085
+      targetPort: 5092
       nodePort: 30004

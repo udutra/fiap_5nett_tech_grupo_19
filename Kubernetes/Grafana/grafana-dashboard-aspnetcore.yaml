@@ -1,11 +1,11 @@
 ﻿apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: grafana-dashboards-config
+  name: grafana-dashboard-aspnetcore-config
 data:
-  contatos-dashboard.json: |
+  ASPNETCore.json: |
     {
-    "annotations": {
+      "annotations": {
       "list": [
         {
           "builtIn": 1,
@@ -20,7 +20,7 @@ data:
           "target": {
             "limit": 100,
             "matchAny": false,
-            "tags": [ ],
+            "tags": [],
             "type": "dashboard"
           },
           "type": "dashboard"
@@ -31,8 +31,8 @@ data:
     "editable": true,
     "fiscalYearStartMonth": 0,
     "graphTooltip": 0,
-    "id": 3,
-    "links": [ ],
+    "id": 1,
+    "links": [],
     "panels": [
       {
         "datasource": {
@@ -484,7 +484,7 @@ data:
                 "mode": "off"
               }
             },
-            "mappings": [ ],
+            "mappings": [],
             "thresholds": {
               "mode": "absolute",
               "steps": [
@@ -499,7 +499,7 @@ data:
               ]
             }
           },
-          "overrides": [ ]
+          "overrides": []
         },
         "gridPos": {
           "h": 8,
@@ -510,7 +510,7 @@ data:
         "id": 49,
         "options": {
           "legend": {
-            "calcs": [ ],
+            "calcs": [],
             "displayMode": "list",
             "placement": "bottom",
             "showLegend": false
@@ -586,7 +586,7 @@ data:
                 "mode": "off"
               }
             },
-            "mappings": [ ],
+            "mappings": [],
             "thresholds": {
               "mode": "absolute",
               "steps": [
@@ -601,7 +601,7 @@ data:
               ]
             }
           },
-          "overrides": [ ]
+          "overrides": []
         },
         "gridPos": {
           "h": 8,
@@ -612,7 +612,7 @@ data:
         "id": 55,
         "options": {
           "legend": {
-            "calcs": [ ],
+            "calcs": [],
             "displayMode": "list",
             "placement": "bottom",
             "showLegend": false
@@ -655,7 +655,7 @@ data:
               "fixedColor": "blue",
               "mode": "fixed"
             },
-            "mappings": [ ],
+            "mappings": [],
             "noValue": "0",
             "thresholds": {
               "mode": "absolute",
@@ -671,7 +671,7 @@ data:
               ]
             }
           },
-          "overrides": [ ]
+          "overrides": []
         },
         "gridPos": {
           "h": 4,
@@ -694,7 +694,7 @@ data:
             "values": false
           },
           "showPercentChange": false,
-          "text": { },
+          "text": {},
           "textMode": "value",
           "wideLayout": true
         },
@@ -728,7 +728,7 @@ data:
               "fixedColor": "dark-red",
               "mode": "fixed"
             },
-            "mappings": [ ],
+            "mappings": [],
             "noValue": "0",
             "thresholds": {
               "mode": "absolute",
@@ -744,7 +744,7 @@ data:
               ]
             }
           },
-          "overrides": [ ]
+          "overrides": []
         },
         "gridPos": {
           "h": 4,
@@ -767,7 +767,7 @@ data:
             "values": false
           },
           "showPercentChange": false,
-          "text": { },
+          "text": {},
           "textMode": "value",
           "wideLayout": true
         },
@@ -803,7 +803,7 @@ data:
               "mode": "fixed"
             },
             "displayName": "https/",
-            "mappings": [ ],
+            "mappings": [],
             "thresholds": {
               "mode": "absolute",
               "steps": [
@@ -818,7 +818,7 @@ data:
               ]
             }
           },
-          "overrides": [ ]
+          "overrides": []
         },
         "gridPos": {
           "h": 4,
@@ -877,7 +877,7 @@ data:
               "fixedColor": "purple",
               "mode": "fixed"
             },
-            "mappings": [ ],
+            "mappings": [],
             "thresholds": {
               "mode": "absolute",
               "steps": [
@@ -892,7 +892,7 @@ data:
               ]
             }
           },
-          "overrides": [ ]
+          "overrides": []
         },
         "gridPos": {
           "h": 4,
@@ -953,7 +953,7 @@ data:
               },
               "inspect": false
             },
-            "mappings": [ ],
+            "mappings": [],
             "thresholds": {
               "mode": "absolute",
               "steps": [
@@ -1095,7 +1095,7 @@ data:
                 "method": false,
                 "route": false
               },
-              "includeByName": { },
+              "includeByName": {},
               "indexByName": {
                 "Time": 0,
                 "Value": 4,
@@ -1132,7 +1132,7 @@ data:
               },
               "inspect": false
             },
-            "mappings": [ ],
+            "mappings": [],
             "thresholds": {
               "mode": "absolute",
               "steps": [
@@ -1300,18 +1300,18 @@ data:
         {
           "allowCustomValue": true,
           "current": {
-            "text": "All",
-            "value": "$__all"
+            "text": "UpdateContact",
+            "value": "UpdateContact"
           },
           "datasource": {
             "type": "prometheus",
             "uid": "eed6p7966f400c"
           },
           "definition": "label_values(http_requests_received_total,job)",
-          "includeAll": true,
+          "includeAll": false,
           "label": "Job",
           "name": "job",
-          "options": [ ],
+          "options": [],
           "query": {
             "qryType": 1,
             "query": "label_values(http_requests_received_total,job)",
@@ -1324,8 +1324,8 @@ data:
         },
         {
           "current": {
-            "text": "createcontact-service.default.svc.cluster.local:8080",
-            "value": "createcontact-service.default.svc.cluster.local:8080"
+            "text": "updatecontact-service.default.svc.cluster.local:8085",
+            "value": "updatecontact-service.default.svc.cluster.local:8085"
           },
           "datasource": {
             "type": "prometheus",
@@ -1335,7 +1335,7 @@ data:
           "includeAll": false,
           "label": "Instance",
           "name": "instance",
-          "options": [ ],
+          "options": [],
           "query": {
             "qryType": 1,
             "query": "label_values(http_requests_received_total{job=\"$job\"},instance)",
@@ -1348,13 +1348,14 @@ data:
         },
         {
           "current": {
-            "text": "/",
-            "value": "/"
+            "text": "api/UpdateContact",
+            "value": "api/UpdateContact"
           },
           "definition": "label_values(http_requests_received_total{job=\"$job\", instance=\"$instance\"},endpoint)",
+          "includeAll": false,
           "label": "endpoint",
           "name": "endpoint",
-          "options": [ ],
+          "options": [],
           "query": {
             "qryType": 1,
             "query": "label_values(http_requests_received_total{job=\"$job\", instance=\"$instance\"},endpoint)",
@@ -1370,10 +1371,10 @@ data:
       "from": "now-5m",
       "to": "now"
     },
-    "timepicker": { },
+    "timepicker": {},
     "timezone": "",
     "title": "ASP.NET Core",
     "uid": "KdDACDp4z",
-    "version": 4,
+    "version": 1,
     "weekStart": ""
-    } 
+    }

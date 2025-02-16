@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: deletecontact-service
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: contact-delete
   ports:
-    - port: 80
-      targetPort: 8080
+    - port: 8086
+      targetPort: 5149
       nodePort: 30002

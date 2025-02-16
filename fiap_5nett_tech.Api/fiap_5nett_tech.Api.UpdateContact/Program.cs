@@ -10,6 +10,7 @@ using Microsoft.OpenApi.Models;
 using OpenTelemetry.Metrics;
 using Prometheus;
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContextFactory<AppDbContext>(options =>
@@ -33,6 +34,18 @@ builder.Services.AddOpenTelemetry()
         b.AddMeter("Microsoft.AspNetCore.Server.Kestrel");
     });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(MyAllowSpecificOrigins,
+        policy =>
+        {
+            policy.WithOrigins("http://localhost.com",
+                    "http://170.0.0.1")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => {
@@ -47,7 +60,30 @@ builder.Services.AddScoped<IRegionRepository, RegionRepository>();
 builder.Services.AddScoped<IContactInterface, ContactService>();
 builder.Services.AddHostedService<RabbitMqUpdateContactConsumerCs>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(MyAllowSpecificOrigins,
+        policy =>
+        {
+            policy.WithOrigins("http://localhost.com",
+                    "http://170.0.0.1")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
+
+using var scope = app.Services.CreateScope();
+var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+try{
+    dbContext.Database.Migrate();// Aplica as Migrations
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Erro ao aplicar migrations: {ex.Message}");
+}
 
 var counter = Metrics.CreateCounter("webapimetricUpdate", "count requests to the Web Api Update Endpoint",
     new CounterConfiguration()
@@ -62,20 +98,23 @@ app.Use((context, next) =>
 });
 
 app.UseMetricServer();
-app.UseHttpMetrics();
+app.UseHttpMetrics(options =>
+{
+    options.AddRouteParameter("route"); // Adiciona o rótulo "route"
+});
+
+
 app.MapPrometheusScrapingEndpoint();
 app.UseRouting();
+app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.MapGet("/", () => "Hello World!");
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.Run();
 

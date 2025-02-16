@@ -24,8 +24,10 @@ spec:
               mountPath: /etc/grafana/provisioning/datasources
             - name: provisioning-dashboards
               mountPath: /etc/grafana/provisioning/dashboards
-            - name: dashboards-json
-              mountPath: /var/lib/grafana/dashboards
+            - name: dashboard-aspnetcore-json
+              mountPath: /var/lib/grafana/dashboards/aspnetcore
+            - name: dashboard-rabbitmq-json
+              mountPath: /var/lib/grafana/dashboards/rabbitmq
       volumes:
         - name: provisioning-datasources
           configMap:
@@ -39,6 +41,9 @@ spec:
             items:
               - key: dashboards.yaml
                 path: dashboards.yaml
-        - name: dashboards-json
+        - name: dashboard-aspnetcore-json
           configMap:
-            name: grafana-dashboards-config
+            name: grafana-dashboard-aspnetcore-config
+        - name: dashboard-rabbitmq-json
+          configMap:
+            name: grafana-dashboard-rabbitmq-config

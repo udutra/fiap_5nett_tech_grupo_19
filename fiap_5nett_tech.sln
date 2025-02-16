@@ -16,6 +16,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Itens de Solução", "Itens
 		.github\workflows\ci.yml = .github\workflows\ci.yml
 		docker-compose.yml = docker-compose.yml
 		DockerfileCC = DockerfileCC
+		DockerfileRC = DockerfileRC
+		DockerfileUC = DockerfileUC
+		DockerfileDC = DockerfileDC
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Api", "Api", "{890A7AC1-A8DC-4720-8FF8-1321B8266810}"

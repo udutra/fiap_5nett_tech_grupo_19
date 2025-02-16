@@ -5,7 +5,7 @@ metadata:
   labels:
     app: contact-read
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: contact-read
@@ -17,5 +17,9 @@ spec:
       containers:
         - name: contact-read
           image: fiap_5nett_tech.api.readcontact:latest
+          imagePullPolicy: Never
           ports:
-            - containerPort: 8080
+            - containerPort: 5166
+          env:
+            - name: ASPNETCORE_URLS
+              value: "http://+:5166"  # Configura para escutar na porta 5156
