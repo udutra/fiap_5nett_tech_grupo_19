@@ -26,3 +26,10 @@ spec:
               value: "guest"
             - name: RABBITMQ_DEFAULT_PASS
               value: "guest"
+          volumeMounts:
+            - name: rabbitmq-storage
+              mountPath: /var/lib/rabbitmq
+      volumes:
+        - name: rabbitmq-storage
+          persistentVolumeClaim:
+            claimName: rabbitmq-pvc

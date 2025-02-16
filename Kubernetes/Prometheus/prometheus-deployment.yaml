@@ -17,6 +17,10 @@ spec:
       containers:
         - name: prometheus
           image: prom/prometheus:latest
+          args:
+            - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--storage.tsdb.path=/prometheus"
+            - "--storage.tsdb.retention.time=15d"
           ports:
             - containerPort: 9090
           volumeMounts:
@@ -26,3 +30,6 @@ spec:
         - name: prometheus-config-volume
           configMap:
             name: prometheus-config
+        - name: prometheus-storage
+          persistentVolumeClaim:
+            claimName: prometheus-pvc
